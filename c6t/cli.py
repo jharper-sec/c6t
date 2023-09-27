@@ -1,6 +1,4 @@
 import typer
-from typing_extensions import Annotated
-
 
 from rich import print as rprint
 
@@ -12,10 +10,10 @@ app = typer.Typer()
 
 
 @app.command()
-def login(profile: str) -> None:
+def login(profile: str = "default") -> None:
     """
     Login to the Contrast platform using your UI credentials (username/password).
-    This will automatically configure your API credentials and save them to the 
+    This will automatically configure your API credentials and save them to the
     credentials file.
     """
     # Hardcoded for now. TODO: Get from config file
@@ -25,11 +23,7 @@ def login(profile: str) -> None:
 
 
 @app.command()
-def configure(
-    profile: Annotated[
-        str, typer.Argument(help="profile to use for TeamServer credentials.")
-    ] = "default"
-) -> None:
+def configure(profile: str = "default") -> None:
     """
     Configure the c6t CLI credentials.
     This will save your credentials to the credentials file.
@@ -47,11 +41,9 @@ def configure(
 
 @app.command()
 def get_agent_config(
-    profile: Annotated[
-        str, typer.Argument(help="profile to use for TeamServer credentials.")
-    ] = "default",
-    path: Annotated[str, typer.Argument()] = "contrast_security.yaml",
-    language: Annotated[str, typer.Argument()] = "JAVA",
+    profile: str = "default",
+    path: str = "contrast_security.yaml",
+    language: str = "JAVA",
 ) -> None:
     """
     Gets the Contrast Agent YAML config file from TeamServer
