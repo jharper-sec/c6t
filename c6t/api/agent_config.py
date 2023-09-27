@@ -34,7 +34,11 @@ class AgentConfig:
         """
         Get the Agent YAML config from the TeamServer
         """
-        url = f"{self.credentials.base_url}/api/ng/{self.credentials.organization_uuid}/agents/external/default/{language}"
+        url = (
+            f"{self.credentials.base_url}/api/ng/"
+            f"{self.credentials.organization_uuid}/agents/external/default/"
+            f"{language}"
+        )
         response = self.session.post(url)
         if response.status_code == 200:
             return response.text

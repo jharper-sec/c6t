@@ -118,7 +118,7 @@ class ContrastUIAuthManager:
         This checks if the email address is associated with an SSO account.
         If the response is 200, the email address is associated with an SSO account.
         If the response is 404, the email address is not associated with an SSO account.
-        If the response is anything else, raises an exception as this is an unexpected status.
+        If the response is anything else, raises an exception.
         """
         try:
             url = f"{self.base_url}/api/public/ng/saml/email/{email}"
@@ -128,7 +128,7 @@ class ContrastUIAuthManager:
             elif response.status_code == 404:
                 self.sso_enabled = True
                 data = response.json()
-                if data.get("success") == False:
+                if data.get("success"):
                     print(data.get("messages"))
             else:
                 response.raise_for_status()
@@ -141,7 +141,7 @@ class ContrastUIAuthManager:
         """
         This checks if the TeamServer license is active.
         If the response is 200, the license is active.
-        If the response is anything else, raises an exception as this is an unknown status.
+        If the response is anything else, raises an exception.
         """
         try:
             url = f"{self.base_url}/api/ng/contrast/license/active"
@@ -356,7 +356,10 @@ class ContrastUIAuthManager:
         """
         Get the SuperAdmin organizations for the user
         """
-        url = f"{self.base_url}/api/ng/superadmin/users/{self.ui_credentials.username}/organizations"
+        url = (
+            f"{self.base_url}/api/ng/superadmin/users/"
+            f"{self.ui_credentials.username}/organizations"
+        )
         params = {
             "includeDefaultOrgs": True,
         }
@@ -383,7 +386,9 @@ class ContrastUIAuthManager:
         """
         Get the SuperAdmin API key for the user
         """
-        url = f"{self.base_url}/api/ng/superadmin/users/{self.organization_uuid}/keys/apikey"
+        url = (
+            f"{self.base_url}/api/ng/superadmin/users/"
+            f"{self.organization_uuid}/keys/apikey")
         try:
             response = self.session.get(url)
             if response.status_code == 200:

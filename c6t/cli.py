@@ -18,11 +18,9 @@ def login(
     ] = "default"
 ) -> None:
     """
-    Configure the c6t CLI credentials by logging in to the Contrast platform using your UI credentials.
-    If no profile is specified, the default profile will be used.
-    You can configure a named profile using the --profile argument.
-    If your credentials file does not exist (the default location is ~/.c6t/credentials),
-    the c6t CLI will create it for you.
+    Login to the Contrast platform using your UI credentials (username/password).
+    This will automatically configure your API credentials and save them to the 
+    credentials file.
     """
     # Hardcoded for now. TODO: Get from config file
     base_url = "https://eval.contrastsecurity.com/Contrast"
@@ -37,10 +35,8 @@ def configure(
     ] = "default"
 ) -> None:
     """
-    Configure the c6t CLI credentials. If no profile is specified, the default profile will be used.
-    You can configure a named profile using the --profile argument.
-    If your credentials file does not exist (the default location is ~/.c6t/credentials),
-    the c6t CLI will create it for you.
+    Configure the c6t CLI credentials.
+    This will save your credentials to the credentials file.
     """
     credentials = ContrastAPICredentials()
     credentials.profile = profile
@@ -62,8 +58,8 @@ def get_agent_config(
     language: Annotated[str, typer.Argument()] = "JAVA",
 ) -> None:
     """
-    Gets the Contrast Agent YAML config file from TeamServer and saves it to the current working directory.
-    Alternatively, you can specify a path to save the file to using the --path argument.
+    Gets the Contrast Agent YAML config file from TeamServer
+    and saves it to the current working directory.
     """
     rprint("Getting agent config...")
     agent_config = AgentConfig(profile=profile)
