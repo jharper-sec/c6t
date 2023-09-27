@@ -43,6 +43,7 @@ def configure(
     the c6t CLI will create it for you.
     """
     credentials = ContrastAPICredentials()
+    credentials.profile = profile
     credentials.base_url = typer.prompt("Contrast TeamServer URL")
     credentials.username = typer.prompt("Contrast username")
     credentials.service_key = typer.prompt("Contrast service key")
