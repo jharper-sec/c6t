@@ -18,6 +18,9 @@ setup(
         "annotated-types",
         "types-requests",
         "types-setuptools",
+        "jinja2",
+        "pyyaml",
+        "gitpython",
     ],      
     entry_points={
         "console_scripts": ['c6t = c6t.__main__:main']
