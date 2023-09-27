@@ -18,6 +18,6 @@ setup(
         "annotated-types",
     ],      
     entry_points={
-        "console_scripts": ['c6t = c6t.cli:app']
+        "console_scripts": ['c6t = c6t.__main__:main']
     },
 )
