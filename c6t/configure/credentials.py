@@ -1,4 +1,3 @@
-import getpass
 import json
 
 from pathlib import Path
@@ -18,7 +17,7 @@ class ContrastUICredentials:
         self.username = username
 
     def get_password_from_user_input(self) -> None:
-        password = getpass.getpass("Password")
+        password = typer.prompt("Password", hide_input=True)
         # TODO: Validate password
         self.password = password
 
