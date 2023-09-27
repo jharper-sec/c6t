@@ -7,17 +7,18 @@ name = "pypi"
 
 [packages]
 requests = "*" # https://requests.readthedocs.io/en/latest/
+shellingham = "*" # https://pypi.org/project/shellingham/
+rich = "*" # https://rich.readthedocs.io/en/stable/introduction.html
 typer = {extras = ["all"], version = "*"} # https://typer.tiangolo.com/
 annotated-types = "*" # https://github.com/annotated-types/annotated-types
-shellingham = "*"
+types-requests = "*" # https://pypi.org/project/types-requests/
+types-setuptools = "*" # https://pypi.org/project/types-setuptools/
 
 [dev-packages]
 mypy = "*" # https://mypy.readthedocs.io/en/stable/
 pytest = "*" # https://docs.pytest.org/en/7.4.x/
 black = "*" # https://black.readthedocs.io/en/stable/
 ruff = "*" # https://beta.ruff.rs/docs/
-types-requests = "*" # https://pypi.org/project/types-requests/
-types-setuptools = "*" # https://pypi.org/project/types-setuptools/
 
 [requires]
 python_version = "3.11"

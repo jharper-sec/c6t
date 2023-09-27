@@ -11,11 +11,13 @@ setup(
     packages=["c6t"],
     zip_safe=False,
     install_requires=[
-        "typer",
+        "typer[all]",
         "rich",
         "shellingham",
         "requests",
         "annotated-types",
+        "types-requests",
+        "types-setuptools",
     ],      
     entry_points={
         "console_scripts": ['c6t = c6t.__main__:main']

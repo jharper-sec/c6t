@@ -12,11 +12,7 @@ app = typer.Typer()
 
 
 @app.command()
-def login(
-    profile: Annotated[
-        str, typer.Argument(help="profile to use for TeamServer credentials.")
-    ] = "default"
-) -> None:
+def login(profile: str) -> None:
     """
     Login to the Contrast platform using your UI credentials (username/password).
     This will automatically configure your API credentials and save them to the 
