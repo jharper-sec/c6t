@@ -11,14 +11,13 @@ typer = {extras = ["all"], version = "*"} # https://typer.tiangolo.com/
 annotated-types = "*" # https://github.com/annotated-types/annotated-types
 pydantic = {extras = ["email"], version = "*"} # https://docs.pydantic.dev/latest/
 
-
 [dev-packages]
 mypy = "*" # https://mypy.readthedocs.io/en/stable/
 pytest = "*" # https://docs.pytest.org/en/7.4.x/
 black = "*" # https://black.readthedocs.io/en/stable/
 ruff = "*" # https://beta.ruff.rs/docs/
-types-requests = "*"
-datamodel-code-generator = "*"
+types-requests = "*" # https://pypi.org/project/types-requests/
+types-setuptools = "*" # https://pypi.org/project/types-setuptools/
 
 [requires]
 python_version = "3.11"

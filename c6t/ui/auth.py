@@ -93,7 +93,7 @@ class ContrastUIAuthManager:
             print(e)
             sys.exit(1)
 
-    def get_information(self):
+    def get_information(self) -> None:
         """
         This gets the public information about the server.
         """
@@ -183,12 +183,12 @@ class ContrastUIAuthManager:
             print(e)
             sys.exit(1)
 
-    def set_xsrf_token_header(self):
+    def set_xsrf_token_header(self) -> None:
         """
         This sets the X-XSRF-TOKEN header to the value of the XSRF-TOKEN cookie.
         """
         for cookie in self.session.cookies:
-            if cookie.name == "XSRF-TOKEN" and cookie.value != None:
+            if cookie.name == "XSRF-TOKEN" and cookie.value:
                 self.session.headers.update(
                     {
                         "X-XSRF-TOKEN": cookie.value,

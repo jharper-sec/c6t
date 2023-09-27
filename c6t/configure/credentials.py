@@ -12,17 +12,17 @@ class ContrastUICredentials:
     password: str
     code: str
 
-    def get_username_from_user_input(self):
+    def get_username_from_user_input(self) -> None:
         username = typer.prompt("Email")
         # TODO: Validate username/email
         self.username = username
 
-    def get_password_from_user_input(self):
+    def get_password_from_user_input(self) -> None:
         password = getpass.getpass("Password")
         # TODO: Validate password
         self.password = password
 
-    def get_code_from_user_input(self):
+    def get_code_from_user_input(self) -> None:
         code = typer.prompt("Code")
         # TODO: Validate code
         self.code = code
