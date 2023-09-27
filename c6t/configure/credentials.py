@@ -67,5 +67,6 @@ class ContrastAPICredentials:
             }
         }
         credentials_file_path = Path("~/.c6t/credentials.json").expanduser()
+        credentials_file_path.parent.mkdir(parents=True, exist_ok=True)
         with open(credentials_file_path, "w") as credentials_file:
             json.dump(credentials, credentials_file, indent=4)
