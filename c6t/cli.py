@@ -1,4 +1,7 @@
 import typer
+import yaml
+from git.repo import Repo
+from jinja2 import Environment, FileSystemLoader
 
 from rich import print as rprint
 
@@ -40,7 +43,7 @@ def configure(profile: str = "default") -> None:
 
 
 @app.command()
-def get_agent_config(
+def agent_config(
     profile: str = "default",
     path: str = "contrast_security.yaml",
     language: str = "JAVA",
@@ -49,11 +52,40 @@ def get_agent_config(
     Gets the Contrast Agent YAML config file from TeamServer
     and saves it to the current working directory.
     """
-    rprint("Getting agent config...")
+
+    # Get initials from user input
+    initials = typer.prompt("Enter your initials")
+    environment = "dev"
+
+    # Attach to repo in current working directory
+    repo = Repo(".")
+
+    # Get credentials from file
+    rprint("Getting agent config from TeamServer...")
     agent_config = AgentConfig(profile=profile)
-    yaml_text = agent_config.get_agent_credentials(language=language)
+    raw_yaml_text = agent_config.get_agent_credentials(language=language)
+    credentials = yaml.safe_load(raw_yaml_text).get("api")
+
+    # Load Jinga2 template and render using YAML text
+    rprint("Rendering agent config...")
+    template_loader = FileSystemLoader(searchpath="./templates")
+    template_env = Environment(loader=template_loader)
+    template = template_env.get_template("contrast_security.yaml.j2")
+    rendered_yaml_text = template.render(
+        url=credentials.get("url"),
+        api_key=credentials.get("api_key"),
+        service_key=credentials.get("service_key"),
+        user_name=credentials.get("user_name"),
+        application_name=f"TerracottaBank-{initials}",
+        branch_name=repo.active_branch,
+        commit_hash=repo.head.commit,
+        committer=repo.head.commit.author,
+        repository=repo.remotes.origin.url,
+        environment=environment,
+    )
+
     rprint("Writing agent config to file...")
-    agent_config.write_agent_config_to_file(path=path, yaml_text=yaml_text)
+    agent_config.write_agent_config_to_file(path=path, yaml_text=rendered_yaml_text)
 
 
 if __name__ == "__main__":

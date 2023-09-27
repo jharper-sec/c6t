@@ -13,6 +13,9 @@ typer = {extras = ["all"], version = "*"} # https://typer.tiangolo.com/
 annotated-types = "*" # https://github.com/annotated-types/annotated-types
 types-requests = "*" # https://pypi.org/project/types-requests/
 types-setuptools = "*" # https://pypi.org/project/types-setuptools/
+jinja2 = "*"
+pyyaml = "*"
+gitpython = "*"
 
 [dev-packages]
 mypy = "*" # https://mypy.readthedocs.io/en/stable/

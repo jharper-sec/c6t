@@ -1,0 +1,11 @@
+api: 
+  url: {{ url }}
+  api_key: {{ api_key}}
+  service_key: {{ service_key }}
+  user_name: {{ user_name}}
+application:
+  name: {{ application_name }}
+  session_metadata: branchName={{ branch_name }},commitHash={{ commit_hash }},committer={{ committer }},repository={{ repository }},environment={{ environment }}
+server:
+  name: {{ application_name }}-{{ environment }}
+  environment: {{ environment }}
