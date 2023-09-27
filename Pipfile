@@ -9,7 +9,7 @@ name = "pypi"
 requests = "*" # https://requests.readthedocs.io/en/latest/
 typer = {extras = ["all"], version = "*"} # https://typer.tiangolo.com/
 annotated-types = "*" # https://github.com/annotated-types/annotated-types
-pydantic = {extras = ["email"], version = "*"} # https://docs.pydantic.dev/latest/
+shellingham = "*"
 
 [dev-packages]
 mypy = "*" # https://mypy.readthedocs.io/en/stable/
