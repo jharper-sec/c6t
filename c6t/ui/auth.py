@@ -400,37 +400,3 @@ class ContrastUIAuthManager:
         except requests.exceptions.HTTPError as e:
             print(e)
             sys.exit(1)
-
-    # def _dump_credentials_to_toml(self) -> None:
-    #     """Dump the credentials to a TOML file"""
-    #     profile_credentials = {profile: credentials}
-    #     credentials_file = Path.home() / ".c6t" / "credentials"
-    #     credentials_file.parent.mkdir(parents=True, exist_ok=True)
-    #     with open(credentials_file, "w") as f:
-    #         f.write(tomlkit.dumps(profile_credentials))
-
-    # def get_teamserver_properties(self):
-    #     try:
-    #         url = f"{self.base_url}/api/ng/global/properties"
-    #         response = self.session.get(url)
-    #         if response.status_code == 200:
-    #             data = response.json()
-    #             print(data)
-    #         else:
-    #             response.raise_for_status()
-    #     except requests.exceptions.HTTPError as e:
-    #         print(e)
-    #         sys.exit(1)
-
-    # def get_profile_roles(self):
-    #     try:
-    #         url = f"{self.base_url}/api/ng/profile/roles"
-    #         response = self.session.get(url)
-    #         if response.status_code == 200:
-    #             data = response.json()
-    #             print(data)
-    #         else:
-    #             response.raise_for_status()
-    #     except requests.exceptions.HTTPError as e:
-    #         print(e)
-    #         sys.exit(1)
