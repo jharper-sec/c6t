@@ -1,0 +1,7 @@
+name: dump-env
+on: workflow_dispatch
+jobs:
+  dump-env:
+    runs-on: ubuntu-latest
+    steps:
+      - run: env
