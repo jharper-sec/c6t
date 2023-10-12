@@ -1,5 +1,6 @@
 import typer
 import yaml
+import pathlib
 from git.repo import Repo
 from jinja2 import Environment, FileSystemLoader
 
@@ -68,7 +69,8 @@ def agent_config(
 
     # Load Jinga2 template and render using YAML text
     rprint("Rendering agent config...")
-    template_loader = FileSystemLoader(searchpath="./templates")
+    template_path = pathlib.Path("~/.c6t/templates").expanduser()
+    template_loader = FileSystemLoader(searchpath=template_path)
     template_env = Environment(loader=template_loader)
     template = template_env.get_template("contrast_security.yaml.j2")
     rendered_yaml_text = template.render(
