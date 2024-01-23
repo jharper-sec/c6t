@@ -1,5 +1,5 @@
 # Class for interacting with the Contrast TeamServer REST APIs
-# Author: josh.anderson@contrastsecurity.com
+# Author: josh.anderson@contrastsecurity.com / jonathan.harper@contrastsecurity.com
 
 from collections import defaultdict
 import datetime
