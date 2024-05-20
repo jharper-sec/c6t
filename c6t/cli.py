@@ -6,6 +6,9 @@ from jinja2 import Environment, FileSystemLoader
 
 from rich import print as rprint
 
+from InquirerPy import inquirer
+from InquirerPy.base.control import Choice
+
 from c6t.configure.credentials import ContrastAPICredentials
 from c6t.ui.auth import ContrastUIAuthManager
 from c6t.api.agent_config import AgentConfig
@@ -15,8 +18,11 @@ from c6t.external.integrations.scw.contrast_scw import scw_create, scw_delete
 app = typer.Typer()
 integrations_app = typer.Typer()
 scw_integration_app = typer.Typer()
-app.add_typer(integrations_app, name="integrations", help="Integrations with other tools")
+app.add_typer(
+    integrations_app, name="integrations", help="Integrations with other tools"
+)
 integrations_app.add_typer(scw_integration_app, name="scw", help="Secure Code Warrior")
+
 
 @app.command("login")
 def login(profile: str = "default") -> None:
@@ -25,10 +31,27 @@ def login(profile: str = "default") -> None:
     This will automatically configure your API credentials and save them to the
     credentials file.
     """
-    # Hardcoded for now. TODO: Get from config file
-    base_url = "https://eval.contrastsecurity.com/Contrast"
-    auth = ContrastUIAuthManager(base_url=base_url)
-    auth.login(profile=profile)
+
+    contrast_environment = inquirer.select(  # type: ignore
+        message="Select your Contrast TeamServer Environment:",
+        choices=[
+            Choice(
+                value="https://cs004.contrastsecurity.com/Contrast", name="Free Trial"
+            ),
+            Choice(
+                value="https://eval.contrastsecurity.com/Contrast", name="Evaluation"
+            ),
+            Choice(
+                value="https://app.contrastsecurity.com/Contrast", name="Enterprise"
+            ),
+            Choice(value=None, name="Exit"),
+        ],
+        default="Free Trial",
+    ).execute()
+
+    if contrast_environment:
+        auth = ContrastUIAuthManager(base_url=contrast_environment)
+        auth.login(profile=profile)
 
 
 @app.command("configure")
@@ -94,6 +117,7 @@ def agent_config(
     rprint("Writing agent config to file...")
     agent_config.write_agent_config_to_file(path=path, yaml_text=rendered_yaml_text)
 
+
 # TODO: Add a command to populate vulnerability references with Secure Code Warrior links
 @scw_integration_app.command("create")
 def scw(profile: str = "default") -> None:
@@ -103,6 +127,7 @@ def scw(profile: str = "default") -> None:
     print("Creating SCW links...")
     scw_create(profile=profile)
 
+
 @scw_integration_app.command("delete")
 def scw_reset(profile: str = "default") -> None:
     """
@@ -110,6 +135,7 @@ def scw_reset(profile: str = "default") -> None:
     """
     print("Deleting SCW links...")
     scw_delete(profile=profile)
+
 
 if __name__ == "__main__":
     app()

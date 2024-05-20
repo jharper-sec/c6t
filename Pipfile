@@ -16,6 +16,7 @@ types-setuptools = "*" # https://pypi.org/project/types-setuptools/
 jinja2 = "*"
 pyyaml = "*"
 gitpython = "*"
+pyinquirer = "*"
 
 [dev-packages]
 mypy = "*" # https://mypy.readthedocs.io/en/stable/
