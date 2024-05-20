@@ -2,9 +2,11 @@ import sys
 
 import requests
 
-from typing import Any
+from typing import Any, List
 
 import typer
+from InquirerPy import inquirer
+from InquirerPy.base.control import Choice
 
 from c6t.configure.credentials import ContrastAPICredentials, ContrastUICredentials
 
@@ -26,7 +28,6 @@ class ContrastUIAuthManager:
         This is the main login function. It calls all the other functions
         """
         self.get_session_cookie()
-        # self.get_information()
         self.ui_credentials.get_username_from_user_input()
         self.check_sso(self.ui_credentials.username)
         if self.sso_enabled:
@@ -49,8 +50,6 @@ class ContrastUIAuthManager:
                     self.toggle_superadmin()
                     self.get_superadmin_users_roles()
                     self.organization_uuid = self.get_superadmin_organizations()
-                    # self.api_credentials.api_key = self.get_superadmin_api_key()
-                    # self.api_credentials.service_key = self.get_service_key()
                     # TODO: SuperAdmin workflow
                     print("SuperAdmin workflow not implemented yet.")
                     break
@@ -59,8 +58,6 @@ class ContrastUIAuthManager:
                     break
                 else:
                     print("Invalid input.")
-        else:
-            print("Not a Superadmin.")
 
         organizations = self.get_organizations()
         self.organization_uuid = self.select_organization(organizations)
@@ -103,9 +100,9 @@ class ContrastUIAuthManager:
             if response.status_code == 200:
                 data = response.json()
                 if data.get("success"):
-                    print(data.get("messages"))
+                    print(data.get("messages")[0])
                 else:
-                    print(data.get("messages"))
+                    print(data.get("messages")[0])
                     sys.exit(1)
             else:
                 response.raise_for_status()
@@ -129,7 +126,7 @@ class ContrastUIAuthManager:
                 self.sso_enabled = True
                 data = response.json()
                 if data.get("success"):
-                    print(data.get("messages"))
+                    print(data.get("messages")[0])
             else:
                 response.raise_for_status()
         except requests.exceptions.HTTPError as e:
@@ -167,7 +164,7 @@ class ContrastUIAuthManager:
             if response.status_code == 200:
                 data = response.json()
                 if data.get("success"):
-                    print(data.get("messages"))
+                    print(data.get("messages")[0])
                     if data.get("toggle_enabled"):
                         # Two-Step Verification (TSV) is enabled
                         self.two_step_verification_enabled = True
@@ -175,7 +172,7 @@ class ContrastUIAuthManager:
                         # Two-Step Verification (TSV) is not enabled
                         self.two_step_verification_enabled = False
                 else:
-                    print(data.get("messages"))
+                    print(data.get("messages")[0])
                     sys.exit(1)
             else:
                 response.raise_for_status()
@@ -208,7 +205,7 @@ class ContrastUIAuthManager:
             if response.status_code == 200:
                 data = response.json()
                 if data.get("success"):
-                    print(data.get("messages"))
+                    print(data.get("messages")[0])
             else:
                 response.raise_for_status()
         except requests.exceptions.HTTPError as e:
@@ -225,13 +222,13 @@ class ContrastUIAuthManager:
             if response.status_code == 200:
                 data = response.json()
                 if data.get("success"):
-                    print(data.get("messages"))
+                    print(data.get("messages")[0])
                     if data.get("adminRole") == "SUPERADMIN":
                         self.ui_credentials.superadmin = True
                     else:
                         self.ui_credentials.superadmin = False
                 else:
-                    print(data.get("messages"))
+                    print(data.get("messages")[0])
                     sys.exit(1)
             else:
                 response.raise_for_status()
@@ -299,22 +296,24 @@ class ContrastUIAuthManager:
         """
         Ask the user to select an organization by index number
         """
-        if len(organizations) == 1:
-            print(f"0: {organizations[0].get('name')}")
-            organization_uuid = organizations[0].get("organization_uuid")
-            return organization_uuid
-        else:
-            print("Select an organization:")
-            for index, organization in enumerate(organizations):
-                print(f"{index}: {organization.get('name')}")
-            while True:
-                try:
-                    org_index = int(typer.prompt("Organization Index"))
-                    break
-                except ValueError:
-                    print("Invalid input. Please enter a number.")
-            organization_uuid = organizations[org_index].get("organization_uuid")
-            return organization_uuid
+
+        organization_choices: List[Choice] = []
+
+        for organization in organizations:
+            organization_choices.append(
+                Choice(
+                    value=organization.get("organization_uuid"),
+                    name=organization.get("name"),
+                )
+            )
+        organization_choices.append(Choice(value=None, name="Exit"))
+
+        organization_uuid = inquirer.select(  # type: ignore
+            message="Select your organization:",
+            choices=organization_choices,
+        ).execute()
+
+        return organization_uuid
 
     def toggle_superadmin(self) -> None:
         """
@@ -368,12 +367,12 @@ class ContrastUIAuthManager:
             if response.status_code == 200:
                 data = response.json()
                 if data.get("success"):
-                    print(data.get("messages"))
+                    print(data.get("messages")[0])
                     for organization in data.get("organizations"):
                         if organization.get("is_superadmin"):
                             return organization.get("organization_uuid")
                 else:
-                    print(data.get("messages"))
+                    print(data.get("messages")[0])
                     sys.exit(1)
             else:
                 response.raise_for_status()
@@ -388,7 +387,8 @@ class ContrastUIAuthManager:
         """
         url = (
             f"{self.base_url}/api/ng/superadmin/users/"
-            f"{self.organization_uuid}/keys/apikey")
+            f"{self.organization_uuid}/keys/apikey"
+        )
         try:
             response = self.session.get(url)
             if response.status_code == 200:
