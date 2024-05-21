@@ -307,18 +307,14 @@ class ContrastUIAuthManager:
                 }
             )
 
-        organization_choices.append(
-            {
-                "name": "Exit",
-                "value": None,
-            }
-        )
+        if len(organization_choices) == 1:
+            return organization_choices[0].get("value")
 
         organization_uuid = questionary.select(
             message="Select your organization:",
             choices=organization_choices,
         ).ask()
-        
+
         return organization_uuid
 
     def toggle_superadmin(self) -> None:

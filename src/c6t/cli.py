@@ -42,32 +42,7 @@ def login(profile: str = "default") -> None:
                 "name": "Evaluation",
                 "value": "https://eval.contrastsecurity.com/Contrast",
             },
-            {
-                "name": "Production - App",
-                "value": "https://app.contrastsecurity.com/Contrast",
-            },
-            {
-                "name": "Production - AppTwo",
-                "value": "https://apptwo.contrastsecurity.com/Contrast",
-            },
-            {
-                "name": "Production - CS001",
-                "value": "https://cs001.contrastsecurity.com/Contrast",
-            },
-            {
-                "name": "Production - CS002",
-                "value": "https://cs002.contrastsecurity.com/Contrast",
-            },
-            {
-                "name": "Production - CS003",
-                "value": "https://cs003.contrastsecurity.com/Contrast",
-            },
-            {
-                "name": "Production - CS004",
-                "value": "https://cs004.contrastsecurity.com/Contrast",
-            },
-            {"name": "Other", "value": "Other"},
-            {"Name": "Exit", "value": None},
+            {"name": "Enterprise", "value": "Enterprise"},
         ],
         default={
             "name": "Free Trial",
@@ -75,11 +50,7 @@ def login(profile: str = "default") -> None:
         },
     ).ask()
 
-    if contrast_environment is None:
-        print("Exiting...")
-        return
-
-    if contrast_environment == "Other":
+    if contrast_environment == "Enterprise":
         contrast_environment = questionary.text(
             "Enter your Contrast TeamServer URL:"
         ).ask()
