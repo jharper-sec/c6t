@@ -6,8 +6,10 @@ from jinja2 import Environment, FileSystemLoader
 
 from rich import print as rprint
 
-from InquirerPy import inquirer
-from InquirerPy.base.control import Choice
+from PyInquirer import prompt  # type: ignore
+
+# from InquirerPy import inquirer
+# from InquirerPy.base.control import Choice
 
 from c6t.configure.credentials import ContrastAPICredentials
 from c6t.ui.auth import ContrastUIAuthManager
@@ -32,25 +34,34 @@ def login(profile: str = "default") -> None:
     credentials file.
     """
 
-    contrast_environment = inquirer.select(  # type: ignore
-        message="Select your Contrast TeamServer Environment:",
-        choices=[
-            Choice(
-                value="https://cs004.contrastsecurity.com/Contrast", name="Free Trial"
-            ),
-            Choice(
-                value="https://eval.contrastsecurity.com/Contrast", name="Evaluation"
-            ),
-            Choice(
-                value="https://app.contrastsecurity.com/Contrast", name="Enterprise"
-            ),
-            Choice(value=None, name="Exit"),
-        ],
-        default="Free Trial",
-    ).execute()
+    environment_questions = [
+        {
+            "type": "list",
+            "name": "environment",
+            "message": "Select your Contrast TeamServer Environment:",
+            "choices": [
+                {
+                    "name": "Free Trial",
+                    "value": "https://cs004.contrastsecurity.com/Contrast",
+                },
+                {
+                    "name": "Evaluation",
+                    "value": "https://eval.contrastsecurity.com/Contrast",
+                },
+                {
+                    "name": "Enterprise",
+                    "value": "https://app.contrastsecurity.com/Contrast",
+                },
+                {"name": "Exit", "value": None},
+            ],
+        }
+    ]
+
+    answers = prompt(environment_questions)  # type: ignore
+    contrast_environment = answers.get("environment")  # type: ignore
 
     if contrast_environment:
-        auth = ContrastUIAuthManager(base_url=contrast_environment)
+        auth = ContrastUIAuthManager(base_url=contrast_environment)  # type: ignore
         auth.login(profile=profile)
 
 

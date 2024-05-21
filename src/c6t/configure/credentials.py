@@ -4,6 +4,7 @@ from pathlib import Path
 
 import typer
 
+
 class ContrastUICredentials:
     base_url: str
     username: str

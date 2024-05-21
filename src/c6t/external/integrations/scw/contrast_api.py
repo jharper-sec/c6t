@@ -6,7 +6,7 @@ import re
 import base64
 from urllib.request import Request, urlopen
 
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from c6t.configure.credentials import ContrastAPICredentials
 
@@ -142,13 +142,15 @@ class ContrastTeamServer:
         return self._title_cwe_cache[title]
 
     def update_rule_references(
-        self, org_id: str, rule_name: str, references: str, api_key: str
-    ):
+        self, org_id: str, rule_name: str, references: List[str], api_key: str
+    ) -> Dict[str, Any]:
         values = {"references": references}
 
         data = json.dumps(values).encode("utf-8")
 
-        response = self.post_api_request(org_id + "/rules/" + rule_name, data, api_key)
+        response = json.loads(
+            self.post_api_request(org_id + "/rules/" + rule_name, data, api_key)
+        ).decode("utf-8")
 
         return response
 

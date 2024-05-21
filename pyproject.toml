@@ -1,9 +1,9 @@
 [project]
 name = "c6t"
-version = "0.0.1"
+version = "0.0.2"
 description = "Unofficial Administrative Command Line Interface for Contrast Security"
 authors = [
-    { name = "Jonathan Harper", email = "39912347+jharper-sec@users.noreply.github.com" }
+    { name = "Jonathan Harper", email = "39912347+jharper-sec@users.noreply.github.com" },
 ]
 dependencies = [
     "requests>=2.32.0",
@@ -15,11 +15,11 @@ dependencies = [
     "jinja2>=3.1.4",
     "pyyaml>=6.0.1",
     "gitpython>=3.1.43",
-    "inquirerpy>=0.3.4",
+    "pyinquirer>=1.0.3",
 ]
-license = {file = "LICENSE"}
+license = { file = "LICENSE" }
 readme = "README.md"
-requires-python = ">= 3.11"
+requires-python = ">= 3.8"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: Apache Software License",

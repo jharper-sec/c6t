@@ -22,8 +22,6 @@ gitpython==3.1.43
     # via c6t
 idna==3.7
     # via requests
-inquirerpy==0.3.4
-    # via c6t
 jinja2==3.1.4
     # via c6t
 markdown-it-py==3.0.0
@@ -32,14 +30,17 @@ markupsafe==2.1.5
     # via jinja2
 mdurl==0.1.2
     # via markdown-it-py
-pfzy==0.3.4
-    # via inquirerpy
-prompt-toolkit==3.0.43
-    # via inquirerpy
+prompt-toolkit==1.0.14
+    # via pyinquirer
 pygments==2.18.0
+    # via pyinquirer
     # via rich
+pyinquirer==1.0.3
+    # via c6t
 pyyaml==6.0.1
     # via c6t
+regex==2024.5.15
+    # via pyinquirer
 requests==2.32.0
     # via c6t
 rich==13.7.1
@@ -48,6 +49,8 @@ rich==13.7.1
 shellingham==1.5.4
     # via c6t
     # via typer
+six==1.16.0
+    # via prompt-toolkit
 smmap==5.0.1
     # via gitdb
 typer==0.12.3
@@ -55,6 +58,8 @@ typer==0.12.3
 types-requests==2.31.0.20240406
     # via c6t
 typing-extensions==4.11.0
+    # via annotated-types
+    # via rich
     # via typer
 urllib3==2.2.1
     # via requests

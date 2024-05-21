@@ -18,6 +18,8 @@ charset-normalizer==3.3.2
 click==8.1.7
     # via black
     # via typer
+exceptiongroup==1.2.1
+    # via pytest
 gitdb==4.0.11
     # via gitpython
 gitpython==3.1.43
@@ -26,8 +28,6 @@ idna==3.7
     # via requests
 iniconfig==2.0.0
     # via pytest
-inquirerpy==0.3.4
-    # via c6t
 jinja2==3.1.4
     # via c6t
 markdown-it-py==3.0.0
@@ -45,19 +45,22 @@ packaging==24.0
     # via pytest
 pathspec==0.12.1
     # via black
-pfzy==0.3.4
-    # via inquirerpy
 platformdirs==4.2.2
     # via black
 pluggy==1.5.0
     # via pytest
-prompt-toolkit==3.0.43
-    # via inquirerpy
+prompt-toolkit==1.0.14
+    # via pyinquirer
 pygments==2.18.0
+    # via pyinquirer
     # via rich
+pyinquirer==1.0.3
+    # via c6t
 pytest==8.2.1
 pyyaml==6.0.1
     # via c6t
+regex==2024.5.15
+    # via pyinquirer
 requests==2.32.0
     # via c6t
 rich==13.7.1
@@ -67,14 +70,23 @@ ruff==0.4.4
 shellingham==1.5.4
     # via c6t
     # via typer
+six==1.16.0
+    # via prompt-toolkit
 smmap==5.0.1
     # via gitdb
+tomli==2.0.1
+    # via black
+    # via mypy
+    # via pytest
 typer==0.12.3
     # via c6t
 types-requests==2.31.0.20240406
     # via c6t
 typing-extensions==4.11.0
+    # via annotated-types
+    # via black
     # via mypy
+    # via rich
     # via typer
 urllib3==2.2.1
     # via requests

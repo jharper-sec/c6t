@@ -7,7 +7,7 @@ An unofficial Administrative Command Line Interface for Contrast Security
 - Download the agent configuration file to your local machine.
 
 ### Pre-requisites
-- Python 3.11+
+- Python 3.8 or higher
 
 ### Installation
 ```shell

@@ -2,11 +2,14 @@ import sys
 
 import requests
 
-from typing import Any, List
+from typing import Any, List, Dict, Optional
 
 import typer
-from InquirerPy import inquirer
-from InquirerPy.base.control import Choice
+
+from PyInquirer import prompt  # type: ignore
+
+# from InquirerPy import inquirer
+# from InquirerPy.base.control import Choice
 
 from c6t.configure.credentials import ContrastAPICredentials, ContrastUICredentials
 
@@ -270,7 +273,7 @@ class ContrastUIAuthManager:
             print(e)
             sys.exit(1)
 
-    def get_organizations(self) -> list[str]:
+    def get_organizations(self) -> List[str]:
         """
         Get the organizations from TeamServer
         """
@@ -297,23 +300,36 @@ class ContrastUIAuthManager:
         Ask the user to select an organization by index number
         """
 
-        organization_choices: List[Choice] = []
+        organization_choices: List[Dict[str, Optional[str]]] = []
 
         for organization in organizations:
             organization_choices.append(
-                Choice(
-                    value=organization.get("organization_uuid"),
-                    name=organization.get("name"),
-                )
+                {
+                    "name": organization.get("name"),
+                    "value": organization.get("organization_uuid"),
+                }
             )
-        organization_choices.append(Choice(value=None, name="Exit"))
 
-        organization_uuid = inquirer.select(  # type: ignore
-            message="Select your organization:",
-            choices=organization_choices,
-        ).execute()
+        organization_choices.append(
+            {
+                "name": "Exit",
+                "value": None,
+            }
+        )
 
-        return organization_uuid
+        organization_questions = [
+            {
+                "type": "list",
+                "name": "organization",
+                "message": "Select your organization:",
+                "choices": organization_choices,
+            }
+        ]
+
+        organization_answers = prompt(organization_questions)  # type: ignore
+        organization_uuid = organization_answers.get("organization")  # type: ignore
+
+        return organization_uuid  # type: ignore
 
     def toggle_superadmin(self) -> None:
         """
@@ -330,7 +346,7 @@ class ContrastUIAuthManager:
             print(e)
             sys.exit(1)
 
-    def get_superadmin_users_roles(self) -> list[str]:
+    def get_superadmin_users_roles(self) -> List[str]:
         # TODO: This may not be needed.
         # TODO: Determine the meaning of the returned roles.
         """
