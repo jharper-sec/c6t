@@ -6,10 +6,7 @@ from typing import Any, List, Dict, Optional
 
 import typer
 
-from PyInquirer import prompt  # type: ignore
-
-# from InquirerPy import inquirer
-# from InquirerPy.base.control import Choice
+import questionary
 
 from c6t.configure.credentials import ContrastAPICredentials, ContrastUICredentials
 
@@ -317,19 +314,12 @@ class ContrastUIAuthManager:
             }
         )
 
-        organization_questions = [
-            {
-                "type": "list",
-                "name": "organization",
-                "message": "Select your organization:",
-                "choices": organization_choices,
-            }
-        ]
-
-        organization_answers = prompt(organization_questions)  # type: ignore
-        organization_uuid = organization_answers.get("organization")  # type: ignore
-
-        return organization_uuid  # type: ignore
+        organization_uuid = questionary.select(
+            message="Select your organization:",
+            choices=organization_choices,
+        ).ask()
+        
+        return organization_uuid
 
     def toggle_superadmin(self) -> None:
         """

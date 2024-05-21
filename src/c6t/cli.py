@@ -6,10 +6,7 @@ from jinja2 import Environment, FileSystemLoader
 
 from rich import print as rprint
 
-from PyInquirer import prompt  # type: ignore
-
-# from InquirerPy import inquirer
-# from InquirerPy.base.control import Choice
+import questionary
 
 from c6t.configure.credentials import ContrastAPICredentials
 from c6t.ui.auth import ContrastUIAuthManager
@@ -34,34 +31,61 @@ def login(profile: str = "default") -> None:
     credentials file.
     """
 
-    environment_questions = [
-        {
-            "type": "list",
-            "name": "environment",
-            "message": "Select your Contrast TeamServer Environment:",
-            "choices": [
-                {
-                    "name": "Free Trial",
-                    "value": "https://cs004.contrastsecurity.com/Contrast",
-                },
-                {
-                    "name": "Evaluation",
-                    "value": "https://eval.contrastsecurity.com/Contrast",
-                },
-                {
-                    "name": "Enterprise",
-                    "value": "https://app.contrastsecurity.com/Contrast",
-                },
-                {"name": "Exit", "value": None},
-            ],
-        }
-    ]
+    contrast_environment = questionary.select(
+        "Select your Contrast TeamServer Environment:",
+        choices=[
+            {
+                "name": "Free Trial",
+                "value": "https://cs004.contrastsecurity.com/Contrast",
+            },
+            {
+                "name": "Evaluation",
+                "value": "https://eval.contrastsecurity.com/Contrast",
+            },
+            {
+                "name": "Production - App",
+                "value": "https://app.contrastsecurity.com/Contrast",
+            },
+            {
+                "name": "Production - AppTwo",
+                "value": "https://apptwo.contrastsecurity.com/Contrast",
+            },
+            {
+                "name": "Production - CS001",
+                "value": "https://cs001.contrastsecurity.com/Contrast",
+            },
+            {
+                "name": "Production - CS002",
+                "value": "https://cs002.contrastsecurity.com/Contrast",
+            },
+            {
+                "name": "Production - CS003",
+                "value": "https://cs003.contrastsecurity.com/Contrast",
+            },
+            {
+                "name": "Production - CS004",
+                "value": "https://cs004.contrastsecurity.com/Contrast",
+            },
+            {"name": "Other", "value": "Other"},
+            {"Name": "Exit", "value": None},
+        ],
+        default={
+            "name": "Free Trial",
+            "value": "https://cs004.contrastsecurity.com/Contrast",
+        },
+    ).ask()
 
-    answers = prompt(environment_questions)  # type: ignore
-    contrast_environment = answers.get("environment")  # type: ignore
+    if contrast_environment is None:
+        print("Exiting...")
+        return
+
+    if contrast_environment == "Other":
+        contrast_environment = questionary.text(
+            "Enter your Contrast TeamServer URL:"
+        ).ask()
 
     if contrast_environment:
-        auth = ContrastUIAuthManager(base_url=contrast_environment)  # type: ignore
+        auth = ContrastUIAuthManager(base_url=contrast_environment)
         auth.login(profile=profile)
 
 
