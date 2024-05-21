@@ -159,12 +159,9 @@ def scw_create(profile: str) -> None:
             refs.insert(0, video)
 
         if len(refs) > 0:
-            print("Updating rule references: ", len(refs))
-            print(*refs, sep="\n")
-            # Update the rule references in Contrast
             res = contrast.update_rule_references(org_id, rule["name"], refs, org_key)
 
-            if res["success"] == True:
+            if res["success"] == True: # type: ignore
                 print(rule["name"] + "/" + rule["title"] + " updated successfully")
         else:
             print(
@@ -207,7 +204,7 @@ def scw_delete(profile: str) -> None:
         # The reset argument has been passed, erase all rule references.
         res = contrast.update_rule_references(org_id, rule["name"], [], org_key)
 
-        if res["success"] == True:
+        if res["success"] == True: # type: ignore
             print(rule["title"] + " reset successfully")
 
     if allow_product_usage_analytics:

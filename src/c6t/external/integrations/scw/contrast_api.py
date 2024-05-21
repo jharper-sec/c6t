@@ -143,14 +143,12 @@ class ContrastTeamServer:
 
     def update_rule_references(
         self, org_id: str, rule_name: str, references: List[str], api_key: str
-    ) -> Dict[str, Any]:
+    ) -> bytes:
         values = {"references": references}
 
         data = json.dumps(values).encode("utf-8")
 
-        response = json.loads(
-            self.post_api_request(org_id + "/rules/" + rule_name, data, api_key)
-        ).decode("utf-8")
+        response = self.post_api_request(org_id + "/rules/" + rule_name, data, api_key)
 
         return response
 
