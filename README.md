@@ -1,4 +1,10 @@
 ## c6t
+An unofficial Administrative Command Line Interface for Contrast Security
+
+### Features
+- Login to your Contrast account and save your API credentials to your local machine.
+- Configure your API credentials manually.
+- Download the agent configuration file to your local machine.
 
 ### Pre-requisites
 - Python 3.11+
