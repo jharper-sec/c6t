@@ -1,8 +1,7 @@
 import typer
 import yaml
-import pathlib
 from git.repo import Repo
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, PackageLoader, select_autoescape
 
 from rich import print as rprint
 
@@ -103,9 +102,11 @@ def agent_config(
 
     # Load Jinga2 template and render using YAML text
     rprint("Rendering agent config...")
-    template_path = pathlib.Path("~/.c6t/templates").expanduser()
-    template_loader = FileSystemLoader(searchpath=template_path)
-    template_env = Environment(loader=template_loader)
+    # template_path = pathlib.Path("~/.c6t/templates").expanduser()
+    # template_loader = FileSystemLoader(searchpath=template_path)
+    template_env = Environment(
+        loader=PackageLoader("c6t", "templates"), autoescape=select_autoescape(["yaml"])
+    )
     template = template_env.get_template("contrast_security.yaml.j2")
     rendered_yaml_text = template.render(
         url=credentials.get("url"),
@@ -124,7 +125,6 @@ def agent_config(
     agent_config.write_agent_config_to_file(path=path, yaml_text=rendered_yaml_text)
 
 
-# TODO: Add a command to populate vulnerability references with Secure Code Warrior links
 @scw_integration_app.command("create")
 def scw(profile: str = "default") -> None:
     """
