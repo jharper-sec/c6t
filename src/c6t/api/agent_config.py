@@ -46,10 +46,10 @@ class AgentConfig:
             response.raise_for_status()
         return ""
 
-    def write_agent_config_to_file(self, yaml_text: str, path: str) -> None:
+    def write_agent_config_to_file(self, text: str, path: str) -> None:
         """
         Write the Agent Config to the file system
         """
         config_path = Path(path)
         with open(config_path, "w") as f:
-            f.write(yaml_text)
+            f.write(text)

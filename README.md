@@ -30,5 +30,5 @@ $ c6t configure
 #### Get Agent Configuration File
 This will download the agent configuration file to your local machine.
 ```shell
-$ c6t get-agent-config
+$ c6t agent-config
 ```

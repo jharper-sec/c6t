@@ -1,7 +1,10 @@
+from typing import Optional
+
 import typer
 import yaml
 from git.repo import Repo
-from jinja2 import Environment, PackageLoader, select_autoescape
+from git.exc import InvalidGitRepositoryError
+from jinja2 import Environment, PackageLoader
 
 from rich import print as rprint
 
@@ -79,20 +82,32 @@ def configure(profile: str = "default") -> None:
 @app.command("agent-config")
 def agent_config(
     profile: str = "default",
-    path: str = "contrast_security.yaml",
+    type: str = "yaml",
+    path: Optional[str] = None,
+    application_name: Optional[str] = None,
+    environment: str = "dev",
     language: str = "JAVA",
+    include_credentials: bool = True,
 ) -> None:
     """
     Gets the Contrast Agent YAML config file from TeamServer
     and saves it to the current working directory.
     """
 
-    # Get initials from user input
-    initials = typer.prompt("Enter your initials")
-    environment = "dev"
+    branch_name: Optional[str] = None
+    commit_hash: Optional[str] = None
+    committer: Optional[str] = None
+    repository: Optional[str] = None
 
     # Attach to repo in current working directory
-    repo = Repo(".")
+    try:
+        repo = Repo(".")
+        branch_name = str(repo.active_branch)
+        commit_hash = str(repo.head.commit)
+        committer = str(repo.head.commit.author)
+        repository = str(repo.remotes.origin.url)
+    except InvalidGitRepositoryError:
+        rprint("This command must be run in a git repository.")
 
     # Get credentials from file
     rprint("Getting agent config from TeamServer...")
@@ -102,27 +117,50 @@ def agent_config(
 
     # Load Jinga2 template and render using YAML text
     rprint("Rendering agent config...")
-    # template_path = pathlib.Path("~/.c6t/templates").expanduser()
-    # template_loader = FileSystemLoader(searchpath=template_path)
     template_env = Environment(
-        loader=PackageLoader("c6t", "templates"), autoescape=select_autoescape(["yaml"])
+        loader=PackageLoader("c6t", "templates"),
     )
-    template = template_env.get_template("contrast_security.yaml.j2")
-    rendered_yaml_text = template.render(
+
+    yaml_template = template_env.get_template("contrast_security.yaml.j2")
+    env_template = template_env.get_template("contrast_security_env.yaml.j2")
+
+    rendered_yaml_text = yaml_template.render(
         url=credentials.get("url"),
         api_key=credentials.get("api_key"),
         service_key=credentials.get("service_key"),
         user_name=credentials.get("user_name"),
-        application_name=f"TerracottaBank-{initials}",
-        branch_name=repo.active_branch,
-        commit_hash=repo.head.commit,
-        committer=repo.head.commit.author,
-        repository=repo.remotes.origin.url,
+        application_name=application_name,
+        branch_name=branch_name,
+        commit_hash=commit_hash,
+        committer=committer,
+        repository=repository,
         environment=environment,
+        include_credentials=include_credentials,
+    )
+
+    rendered_env_text = env_template.render(
+        url=credentials.get("url"),
+        api_key=credentials.get("api_key"),
+        service_key=credentials.get("service_key"),
+        user_name=credentials.get("user_name"),
+        application_name=application_name,
+        branch_name=branch_name,
+        commit_hash=commit_hash,
+        committer=committer,
+        repository=repository,
+        environment=environment,
+        include_credentials=include_credentials,
     )
 
     rprint("Writing agent config to file...")
-    agent_config.write_agent_config_to_file(path=path, yaml_text=rendered_yaml_text)
+    if type == "yaml":
+        if path is None:
+            path = "contrast_security.yaml"
+        agent_config.write_agent_config_to_file(path=path, text=rendered_yaml_text)
+    elif type == "env":
+        if path is None:
+            path = "contrast.env"
+        agent_config.write_agent_config_to_file(path=path, text=rendered_env_text)
 
 
 @scw_integration_app.command("create")
@@ -130,7 +168,7 @@ def scw(profile: str = "default") -> None:
     """
     Populate vulnerability references with Secure Code Warrior links.
     """
-    print("Creating SCW links...")
+    rprint("Creating SCW links...")
     scw_create(profile=profile)
 
 
@@ -139,7 +177,7 @@ def scw_reset(profile: str = "default") -> None:
     """
     Delete vulnerability references and reset to the original Contrast links.
     """
-    print("Deleting SCW links...")
+    rprint("Deleting SCW links...")
     scw_delete(profile=profile)
 
 
