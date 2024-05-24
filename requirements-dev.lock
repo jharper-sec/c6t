@@ -18,6 +18,8 @@ charset-normalizer==3.3.2
 click==8.1.7
     # via black
     # via typer
+cssselect==1.2.0
+    # via types-lxml
 exceptiongroup==1.2.1
     # via pytest
 gitdb==4.0.11
@@ -29,6 +31,8 @@ idna==3.7
 iniconfig==2.0.0
     # via pytest
 jinja2==3.1.4
+    # via c6t
+lxml==5.2.2
     # via c6t
 markdown-it-py==3.0.0
     # via rich
@@ -75,6 +79,12 @@ tomli==2.0.1
     # via pytest
 typer==0.12.3
     # via c6t
+types-beautifulsoup4==4.12.0.20240511
+    # via types-lxml
+types-html5lib==1.1.11.20240228
+    # via types-beautifulsoup4
+types-lxml==2024.4.14
+    # via c6t
 types-requests==2.31.0.20240406
     # via c6t
 typing-extensions==4.11.0
@@ -83,6 +93,7 @@ typing-extensions==4.11.0
     # via mypy
     # via rich
     # via typer
+    # via types-lxml
 urllib3==2.2.1
     # via requests
     # via types-requests

@@ -169,5 +169,8 @@ cython_debug/
 logs
 
 # Contrast Security
-contrast_security.yaml
+*.jar
 *.env
+*.sha1
+contrast_security.yaml
+maven-metadata.xml
