@@ -1,4 +1,5 @@
 from typing import Optional
+from pathlib import Path
 
 import typer
 import yaml
@@ -13,7 +14,7 @@ import questionary
 from c6t.configure.credentials import ContrastAPICredentials
 from c6t.ui.auth import ContrastUIAuthManager
 from c6t.api.agent_config import AgentConfig
-
+from c6t.api.maven_repo import download_java_agent_from_repo
 from c6t.external.integrations.scw.contrast_scw import scw_create, scw_delete
 
 app = typer.Typer()
@@ -161,6 +162,25 @@ def agent_config(
         if path is None:
             path = "contrast.env"
         agent_config.write_agent_config_to_file(path=path, text=rendered_env_text)
+
+
+@app.command("download-agent")
+def download_agent(
+    language: str = "JAVA",
+    repository_url: str = "https://repo1.maven.org/maven2",
+    version: str = "latest",
+    target_dir: Path = Path("."),
+) -> None:
+    """
+    Download the Contrast agent for the specified language.
+    """
+    if language == "JAVA":
+        rprint(f"Downloading Contrast agent ({version})...")
+        download_java_agent_from_repo(
+            repository_url=repository_url, version=version, target_dir=target_dir
+        )
+    else:
+        rprint("Unsupported language")
 
 
 @scw_integration_app.command("create")

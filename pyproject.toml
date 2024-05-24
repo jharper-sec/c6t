@@ -9,13 +9,15 @@ dependencies = [
     "requests>=2.32.0",
     "shellingham>=1.5.4",
     "rich>=13.7.1",
-    "typer[all]>=0.12.3",
+    "typer>=0.12.3",
     "annotated-types>=0.6.0",
     "types-requests>=2.31.0.20240406",
     "jinja2>=3.1.4",
     "pyyaml>=6.0.1",
     "gitpython>=3.1.43",
     "questionary>=2.0.1",
+    "lxml>=5.2.2",
+    "types-lxml>=2024.4.14",
 ]
 license = { file = "LICENSE" }
 readme = "README.md"

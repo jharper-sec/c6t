@@ -16,6 +16,8 @@ charset-normalizer==3.3.2
     # via requests
 click==8.1.7
     # via typer
+cssselect==1.2.0
+    # via types-lxml
 gitdb==4.0.11
     # via gitpython
 gitpython==3.1.43
@@ -23,6 +25,8 @@ gitpython==3.1.43
 idna==3.7
     # via requests
 jinja2==3.1.4
+    # via c6t
+lxml==5.2.2
     # via c6t
 markdown-it-py==3.0.0
     # via rich
@@ -50,12 +54,19 @@ smmap==5.0.1
     # via gitdb
 typer==0.12.3
     # via c6t
+types-beautifulsoup4==4.12.0.20240511
+    # via types-lxml
+types-html5lib==1.1.11.20240228
+    # via types-beautifulsoup4
+types-lxml==2024.4.14
+    # via c6t
 types-requests==2.31.0.20240406
     # via c6t
 typing-extensions==4.11.0
     # via annotated-types
     # via rich
     # via typer
+    # via types-lxml
 urllib3==2.2.1
     # via requests
     # via types-requests
