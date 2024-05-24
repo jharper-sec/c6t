@@ -1,11 +1,22 @@
+{% if include_credentials -%}
 api: 
   url: {{ url }}
   api_key: {{ api_key}}
   service_key: {{ service_key }}
   user_name: {{ user_name}}
+{% endif -%}
 application:
+  {% if application_name -%}
   name: {{ application_name }}
-  session_metadata: branchName={{ branch_name }},commitHash={{ commit_hash }},committer={{ committer }},repository={{ repository }},environment={{ environment }}
+  {% endif -%}
+  session_metadata: 
+  {%- if branch_name %} branchName={{ branch_name }},{% endif -%}
+  {%- if commit_hash %}commitHash={{ commit_hash }},{% endif -%}
+  {%- if committer %}committer={{ committer }},{% endif -%}
+  {%- if repository %}repository={{ repository }},{% endif -%}
+  {%- if environment %}environment={{ environment }}{% endif %}
 server:
+  {% if application_name -%}
   name: {{ application_name }}-{{ environment }}
+  {% endif -%}
   environment: {{ environment }}

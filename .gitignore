@@ -170,3 +170,4 @@ logs
 
 # Contrast Security
 contrast_security.yaml
+*.env

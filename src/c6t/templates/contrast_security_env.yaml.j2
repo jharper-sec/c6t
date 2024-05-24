@@ -1,0 +1,19 @@
+{% if include_credentials -%}
+CONTRAST__API__URL={{ url }}
+CONTRAST__API__API_KEY{{ api_key}}
+CONTRAST__API__SERVICE_KEY={{ service_key }}
+CONTRAST__API__USER_NAME={{ user_name}}
+{% endif -%}
+{% if application_name -%}
+CONTRAST__APPLICATION__NAME={{ application_name }}
+{% endif -%}
+CONTRAST__APPLICATION__SESSION_METADATA=
+  {%- if branch_name %}branchName={{ branch_name }},{% endif -%}
+  {%- if commit_hash %}commitHash={{ commit_hash }},{% endif -%}
+  {%- if committer %}committer={{ committer }},{% endif -%}
+  {%- if repository %}repository={{ repository }},{% endif -%}
+  {%- if environment %}environment={{ environment }}{% endif %}
+{% if application_name -%}
+CONTRAST__SERVER__NAME={{ application_name }}-{{ environment }}
+{% endif -%}
+CONTRAST__SERVER__ENVIRONMENT={{ environment }}

@@ -42,15 +42,21 @@ class ContrastAPICredentials:
         Get credentials from file in JSON format
         """
         credentials_file_path = Path("~/.c6t/credentials.json").expanduser()
-        with open(credentials_file_path, "r") as credentials_file:
-            credentials = json.load(credentials_file)
-        self.profile = profile
-        self.base_url = credentials.get(profile).get("url")
-        self.username = credentials.get(profile).get("user_name")
-        self.api_key = credentials.get(profile).get("api_key")
-        self.service_key = credentials.get(profile).get("service_key")
-        self.organization_uuid = credentials.get(profile).get("organization_id")
-        self.superadmin = credentials.get(profile).get("superadmin")
+        try:
+            with open(credentials_file_path, "r") as credentials_file:
+                credentials = json.load(credentials_file)
+            self.profile = profile
+            self.base_url = credentials.get(profile).get("url")
+            self.username = credentials.get(profile).get("user_name")
+            self.api_key = credentials.get(profile).get("api_key")
+            self.service_key = credentials.get(profile).get("service_key")
+            self.organization_uuid = credentials.get(profile).get("organization_id")
+            self.superadmin = credentials.get(profile).get("superadmin")
+        except FileNotFoundError:
+            typer.echo(
+                "Credentials file not found. Please run `c6t login` or `c6t configure`."
+            )
+            raise typer.Abort()  # Exit the program
 
     def write_credentials_to_file(self) -> None:
         """
