@@ -14,7 +14,7 @@ import questionary
 from c6t.configure.credentials import ContrastAPICredentials
 from c6t.ui.auth import ContrastUIAuthManager
 from c6t.api.agent_config import AgentConfig
-from c6t.api.maven_repo import download_java_agent_from_repo
+from c6t.api import maven_repo
 from c6t.external.integrations.scw.contrast_scw import scw_create, scw_delete
 
 app = typer.Typer()
@@ -174,11 +174,22 @@ def download_agent(
     """
     Download the Contrast agent for the specified language.
     """
+
+    MAVEN_PACKAGE_NAMESPACE = "com/contrastsecurity/contrast-agent"
+
     if language == "JAVA":
         rprint(f"Downloading Contrast agent ({version})...")
-        download_java_agent_from_repo(
-            repository_url=repository_url, version=version, target_dir=target_dir
+        downloader = maven_repo.FileDownloader()
+        verifier = maven_repo.ChecksumVerifier()
+        metadata_handler = maven_repo.MavenMetadataHandler(
+            downloader=downloader, namespace=MAVEN_PACKAGE_NAMESPACE
         )
+        agent_downloader = maven_repo.JavaAgentDownloader(
+            downloader=downloader, verifier=verifier, metadata_handler=metadata_handler
+        )
+
+        agent_downloader.download_agent(repository_url, version, target_dir)
+
     else:
         rprint("Unsupported language")
 
