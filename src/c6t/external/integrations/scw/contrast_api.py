@@ -6,19 +6,22 @@ import re
 import base64
 from urllib.request import Request, urlopen
 
+import typing
 from typing import Any, Dict, List
 
 from c6t.configure.credentials import ContrastAPICredentials
 
 
-def load_config():
-    with open("config.json", "r") as config:
-        config = json.load(config)
+def load_config() -> Dict[str, Any]:
+    with open("config.json", "r") as config_data:
+        config = typing.cast(Dict[str, Any], json.load(config_data))
 
     return config
 
 
-def contrast_instance_from_json(credentials: ContrastAPICredentials):
+def contrast_instance_from_json(
+    credentials: ContrastAPICredentials,
+) -> "ContrastTeamServer":
     return ContrastTeamServer(
         credentials.base_url,
         credentials.api_key,
@@ -81,11 +84,11 @@ class ContrastTeamServer:
         self._title_cwe_cache: Dict[Any, Any] = {}
 
     @property
-    def teamserver_url(self):
+    def teamserver_url(self) -> str:
         return self._teamserver_url
 
     # Function to call the Contrast TeamServer REST API and retrieve results as JSON
-    def api_request(self, path: str, api_key: str = ""):
+    def api_request(self, path: str, api_key: str = "") -> Dict[str, Any]:
         if not api_key:
             api_key = self._api_key
 
@@ -95,12 +98,12 @@ class ContrastTeamServer:
         req.add_header("Authorization", self._authorization_header)
 
         res = urlopen(req).read()
-        data = json.loads(res.decode("utf-8"))
+        data = typing.cast(Dict[str, Any], json.loads(res.decode("utf-8")))
 
         return data
 
     # Function to POST data to the Contrast TeamServer REST API and retrieve results as JSON
-    def post_api_request(self, path: str, data: bytes, api_key: str = ""):
+    def post_api_request(self, path: str, data: bytes, api_key: str = "") -> bytes:
         if not api_key:
             api_key = self._api_key
 
@@ -116,30 +119,36 @@ class ContrastTeamServer:
         return data
 
     # Superadmin API call to retrieve the API key for a specific organization
-    def org_api_key(self, org_id: str):
+    def org_api_key(self, org_id: str) -> Dict[str, str]:
         if self._is_superadmin:
             return self.api_request("superadmin/organizations/" + org_id + "/apiKey")
         else:
             return {"api_key": self._api_key}
 
     # Organization specific API call to list assess policy (rules)
-    def list_org_policy(self, org_id: str, api_key: str, expand_apps: bool = False):
+    def list_org_policy(
+        self, org_id: str, api_key: str, expand_apps: bool = False
+    ) -> List[Dict[str, Any]]:
         call = org_id + "/rules?expand=skip_links"
         if expand_apps:
             call += ",app_assess_rules"
 
-        return self.api_request(call, api_key)["rules"]
+        rules = typing.cast(
+            List[Dict[str, Any]], self.api_request(call, api_key)["rules"]
+        )
+
+        return rules
 
     # Organization specific API call to retrieve CWE ID for a trace. Cache results locally by rule name as a speedup.
-    def trace_cwe(self, org_id: str, title: str, api_key: str):
+    def trace_cwe(self, org_id: str, title: str, api_key: str) -> str:
         if len(self._title_cwe_cache) == 0:
             policies = self.list_org_policy(org_id, api_key)
             for policy in policies:
                 self._title_cwe_cache[policy["title"]] = (
                     policy["cwe"].split("/")[-1].replace(".html", "")
                 )
-
-        return self._title_cwe_cache[title]
+        title = typing.cast(str, self._title_cwe_cache[title])
+        return title
 
     def update_rule_references(
         self, org_id: str, rule_name: str, references: List[str], api_key: str
@@ -152,7 +161,7 @@ class ContrastTeamServer:
 
         return response
 
-    def send_usage_event(self, org_id: str, is_reset: bool, api_key: str):
+    def send_usage_event(self, org_id: str, is_reset: bool, api_key: str) -> bytes:
         usage_mode_endpoint = "undo" if is_reset else "setup"
 
         values = {"type": usage_mode_endpoint}

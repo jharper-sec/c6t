@@ -8,31 +8,35 @@ import json
 import urllib.parse
 import urllib.error
 
-from typing import List
+import typing
+from typing import List, Dict, Any
 
 from c6t.configure.credentials import ContrastAPICredentials
 
 
-def get_scw_base_url(cwe: str):
+def get_scw_base_url(cwe: str) -> str:
     return (
         "https://integration-api.securecodewarrior.com/api/v1/trial?Id=contrast&MappingList=cwe&MappingKey="
         + cwe
     )
 
 
-def get_scw_data(url: str):
+def get_scw_data(url: str) -> Dict[str, Any]:
     try:
         req = Request(url)
 
         res = urlopen(req).read()
-        data = json.loads(res.decode("utf-8"))
-
+        if res is None:
+            raise Exception("No data received from Secure Code Warrior")
+        data = typing.cast(Dict[str, Any], json.loads(res.decode("utf-8")))
         return data
     except urllib.error.HTTPError as err:
         print(err)
+        print(traceback.format_exc())
+        raise Exception("No data received from Secure Code Warrior")
 
 
-def map_contrast_lang_to_scw_lang(contrast_lang: str):
+def map_contrast_lang_to_scw_lang(contrast_lang: str) -> str:
     langs = {
         ".NET": "c#",
         ".NET Core": "c#(.net):mvc",
@@ -161,7 +165,7 @@ def scw_create(profile: str) -> None:
         if len(refs) > 0:
             res = contrast.update_rule_references(org_id, rule["name"], refs, org_key)
 
-            if res["success"] == True: # type: ignore
+            if res["success"] == True:  # type: ignore
                 print(rule["name"] + "/" + rule["title"] + " updated successfully")
         else:
             print(
@@ -204,7 +208,7 @@ def scw_delete(profile: str) -> None:
         # The reset argument has been passed, erase all rule references.
         res = contrast.update_rule_references(org_id, rule["name"], [], org_key)
 
-        if res["success"] == True: # type: ignore
+        if res["success"] == True:  # type: ignore
             print(rule["title"] + " reset successfully")
 
     if allow_product_usage_analytics:

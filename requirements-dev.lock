@@ -84,9 +84,8 @@ types-beautifulsoup4==4.12.0.20240511
 types-html5lib==1.1.11.20240228
     # via types-beautifulsoup4
 types-lxml==2024.4.14
-    # via c6t
+types-pyyaml==6.0.12.20240311
 types-requests==2.31.0.20240406
-    # via c6t
 typing-extensions==4.11.0
     # via annotated-types
     # via black

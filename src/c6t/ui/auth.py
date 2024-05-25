@@ -2,6 +2,7 @@ import sys
 
 import requests
 
+import typing
 from typing import Any, List, Dict, Optional
 
 import typer
@@ -163,8 +164,10 @@ class ContrastUIAuthManager:
             response = self.session.post(url, data=data)
             if response.status_code == 200:
                 data = response.json()
+                messages: List[str] = []
                 if data.get("success"):
-                    print(data.get("messages")[0])
+                    messages = typing.cast(List[str], data.get("messages"))
+                    print(messages)
                     if data.get("toggle_enabled"):
                         # Two-Step Verification (TSV) is enabled
                         self.two_step_verification_enabled = True
@@ -172,7 +175,8 @@ class ContrastUIAuthManager:
                         # Two-Step Verification (TSV) is not enabled
                         self.two_step_verification_enabled = False
                 else:
-                    print(data.get("messages")[0])
+                    messages = typing.cast(List[str], data.get("messages"))
+                    print(messages)
                     sys.exit(1)
             else:
                 response.raise_for_status()
@@ -205,7 +209,8 @@ class ContrastUIAuthManager:
             if response.status_code == 200:
                 data = response.json()
                 if data.get("success"):
-                    print(data.get("messages")[0])
+                    messages: List[str] = typing.cast(List[str], data.get("messages"))
+                    print(messages)
             else:
                 response.raise_for_status()
         except requests.exceptions.HTTPError as e:
@@ -245,7 +250,7 @@ class ContrastUIAuthManager:
             response = self.session.get(url)
             if response.status_code == 200:
                 data = response.json()
-                return data.get("api_key")
+                return typing.cast(str, data.get("api_key"))
             else:
                 response.raise_for_status()
             return ""
@@ -262,7 +267,7 @@ class ContrastUIAuthManager:
             response = self.session.get(url)
             if response.status_code == 200:
                 data = response.json()
-                return data.get("service_key")
+                return typing.cast(str, data.get("service_key"))
             else:
                 response.raise_for_status()
             return ""
@@ -281,7 +286,7 @@ class ContrastUIAuthManager:
             if response.status_code == 200:
                 data = response.json()
                 if data.get("count") > 0:
-                    return data.get("organizations")
+                    return typing.cast(List[str], data.get("organizations"))
                 else:
                     print("No organizations found")
                     sys.exit(1)
@@ -345,7 +350,7 @@ class ContrastUIAuthManager:
                 data = response.json()
                 roles = data.get("roles")
                 print(roles)
-                return roles
+                return typing.cast(List[str], roles)
             else:
                 response.raise_for_status()
             return [""]
@@ -372,7 +377,10 @@ class ContrastUIAuthManager:
                     print(data.get("messages")[0])
                     for organization in data.get("organizations"):
                         if organization.get("is_superadmin"):
-                            return organization.get("organization_uuid")
+                            organization_uuid = typing.cast(
+                                str, organization.get("organization_uuid")
+                            )
+                            return organization_uuid
                 else:
                     print(data.get("messages")[0])
                     sys.exit(1)
@@ -395,7 +403,8 @@ class ContrastUIAuthManager:
             response = self.session.get(url)
             if response.status_code == 200:
                 data = response.json()
-                return data.get("api_key")
+                api_key = typing.cast(str, data.get("api_key"))
+                return api_key
             else:
                 response.raise_for_status()
             return ""
