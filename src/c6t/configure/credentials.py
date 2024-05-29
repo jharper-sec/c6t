@@ -1,7 +1,5 @@
 import json
-
 from pathlib import Path
-
 import typer
 
 
@@ -62,17 +60,23 @@ class ContrastAPICredentials:
         """
         Write credentials to file in JSON format
         """
-        credentials = {
-            self.profile: {
-                "url": self.base_url,
-                "user_name": self.username,
-                "api_key": self.api_key,
-                "service_key": self.service_key,
-                "organization_id": self.organization_uuid,
-                "superadmin": self.superadmin,
-            }
-        }
         credentials_file_path = Path("~/.c6t/credentials.json").expanduser()
         credentials_file_path.parent.mkdir(parents=True, exist_ok=True)
+
+        try:
+            with open(credentials_file_path, "r") as credentials_file:
+                credentials = json.load(credentials_file)
+        except FileNotFoundError:
+            credentials = {}
+
+        credentials[self.profile] = {
+            "url": self.base_url,
+            "user_name": self.username,
+            "api_key": self.api_key,
+            "service_key": self.service_key,
+            "organization_id": self.organization_uuid,
+            "superadmin": self.superadmin,
+        }
+
         with open(credentials_file_path, "w") as credentials_file:
             json.dump(credentials, credentials_file, indent=4)
