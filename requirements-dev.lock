@@ -85,6 +85,7 @@ types-html5lib==1.1.11.20240228
     # via types-beautifulsoup4
 types-lxml==2024.4.14
 types-pyyaml==6.0.12.20240311
+    # via c6t
 types-requests==2.31.0.20240406
 typing-extensions==4.11.0
     # via annotated-types
