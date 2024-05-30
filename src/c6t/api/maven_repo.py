@@ -1,6 +1,7 @@
 import hashlib
 from io import BytesIO
 from pathlib import Path
+import typing
 from typing import Any
 import shutil
 import tempfile
@@ -21,9 +22,7 @@ class ChecksumVerifier:
         """
         rprint(f"[cyan]Verifying checksum for {target_filename.name}...")
         with open(target_filename, "rb") as f:
-            target_checksum = hashlib.new(
-                algorithm, f.read(), usedforsecurity=True
-            ).hexdigest()
+            target_checksum = hashlib.new(algorithm, f.read()).hexdigest()
         with open(checksum_filename, "r") as f:
             checksum = f.read().strip()
         if target_checksum != checksum:
@@ -34,7 +33,7 @@ class ChecksumVerifier:
 
 
 class FileDownloader:
-    def __init__(self):
+    def __init__(self) -> None:
         self.session = requests.Session()
 
     def download_file(self, url: str, filename: Path) -> None:
@@ -84,7 +83,7 @@ class MavenMetadataHandler:
             latest = versioning.find("latest")
             if latest is not None:
                 if latest.text is not None:
-                    return latest.text.strip()
+                    return typing.cast(str, latest.text.strip())
         raise ValueError("Could not find latest version in Maven metadata.")
 
     def is_version_in_metadata(self, root: Any, version: str) -> bool:

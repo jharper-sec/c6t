@@ -14,17 +14,17 @@ MAVEN_PACKAGE_NAMESPACE = "com/contrastsecurity/contrast-agent"
 
 
 @pytest.fixture
-def mock_downloader():
+def mock_downloader() -> MagicMock:
     return MagicMock(spec=FileDownloader)
 
 
 @pytest.fixture
-def mock_verifier():
+def mock_verifier() -> MagicMock:
     return MagicMock(spec=ChecksumVerifier)
 
 
 @pytest.fixture
-def mock_metadata_handler(mock_downloader: MagicMock):
+def mock_metadata_handler(mock_downloader: MagicMock) -> MavenMetadataHandler:
     return MavenMetadataHandler(mock_downloader, MAVEN_PACKAGE_NAMESPACE)
 
 
@@ -33,26 +33,26 @@ def agent_downloader(
     mock_downloader: MagicMock,
     mock_verifier: MagicMock,
     mock_metadata_handler: MagicMock,
-):
+) -> JavaAgentDownloader:
     return JavaAgentDownloader(mock_downloader, mock_verifier, mock_metadata_handler)
 
 
-def test_verify_file_checksum_success(mock_verifier: MagicMock):
+def test_verify_file_checksum_success(mock_verifier: MagicMock) -> None:
     mock_verifier.verify_file_checksum.return_value = True
     result = ChecksumVerifier.verify_file_checksum(
-        Path("data/testfile"), Path("data/checksumfile"), "sha1"
+        Path("tests/data/testfile"), Path("tests/data/checksumfile"), "sha1"
     )
     assert result is True
 
 
-def test_download_file(mock_downloader: MagicMock):
+def test_download_file(mock_downloader: MagicMock) -> None:
     url = "https://example.com/file"
     filename = Path("/path/to/file")
     mock_downloader.download_file(url, filename)
     mock_downloader.download_file.assert_called_once_with(url, filename)
 
 
-def test_parse_maven_metadata(mock_metadata_handler: MagicMock):
+def test_parse_maven_metadata(mock_metadata_handler: MagicMock) -> None:
     metadata_content = """<metadata>
                             <versioning>
                                 <latest>1.2.3</latest>
@@ -60,11 +60,12 @@ def test_parse_maven_metadata(mock_metadata_handler: MagicMock):
                           </metadata>"""
     with patch("builtins.open", mock_open(read_data=metadata_content)):
         root = mock_metadata_handler.parse_maven_metadata(Path("metadata.xml"))
-        assert isinstance(root, etree._Element)  # type: ignore
-        assert root.find("versioning").find("latest").text == "1.2.3"  # type: ignore
+        versioning = root.find("versioning")
+        assert versioning is not None
+        assert versioning.find("latest").text == "1.2.3"
 
 
-def test_get_latest_version(mock_metadata_handler: MagicMock):
+def test_get_latest_version(mock_metadata_handler: MagicMock) -> None:
     root = etree.Element("metadata")
     versioning = etree.SubElement(root, "versioning")
     latest = etree.SubElement(versioning, "latest")
@@ -73,7 +74,7 @@ def test_get_latest_version(mock_metadata_handler: MagicMock):
     assert version == "1.2.3"
 
 
-def test_is_version_in_metadata(mock_metadata_handler: MagicMock):
+def test_is_version_in_metadata(mock_metadata_handler: MagicMock) -> None:
     root = etree.Element("metadata")
     versioning = etree.SubElement(root, "versioning")
     versions = etree.SubElement(versioning, "versions")
@@ -87,7 +88,7 @@ def test_download_agent(
     mock_metadata_handler: MagicMock,
     mock_verifier: MagicMock,
     mock_downloader: MagicMock,
-):
+) -> None:
     repository_url = "https://example.com/maven-repo"
     version = "latest"
     target_dir = Path("/path/to/target/dir")

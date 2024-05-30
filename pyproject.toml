@@ -11,13 +11,11 @@ dependencies = [
     "rich>=13.7.1",
     "typer>=0.12.3",
     "annotated-types>=0.6.0",
-    "types-requests>=2.31.0.20240406",
     "jinja2>=3.1.4",
     "pyyaml>=6.0.1",
     "gitpython>=3.1.43",
     "questionary>=2.0.1",
     "lxml>=5.2.2",
-    "types-lxml>=2024.4.14",
 ]
 license = { file = "LICENSE" }
 readme = "README.md"
@@ -47,6 +45,9 @@ dev-dependencies = [
     "pytest>=8.2.1",
     "black>=24.4.2",
     "ruff>=0.4.4",
+    "types-pyyaml>=6.0.12.20240311",
+    "types-requests>=2.31.0.20240406",
+    "types-lxml>=2024.4.14",
 ]
 
 [tool.hatch.metadata]
@@ -54,3 +55,13 @@ allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/c6t"]
+
+[tool.mypy]
+python_version = "3.8"
+strict = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_return_any = true
+warn_unreachable = true
