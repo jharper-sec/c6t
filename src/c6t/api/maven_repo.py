@@ -6,7 +6,7 @@ from typing import Any
 import shutil
 import tempfile
 
-import requests
+import httpx
 from rich.progress import Progress
 from rich import print as rprint
 from lxml import etree
@@ -34,21 +34,20 @@ class ChecksumVerifier:
 
 class FileDownloader:
     def __init__(self) -> None:
-        self.session = requests.Session()
+        self.client = httpx.Client()
 
     def download_file(self, url: str, filename: Path) -> None:
         rprint(f"[cyan]Starting download from: {url}")
         with Progress() as progress:
             task = progress.add_task(f"[cyan]Downloading...", total=100)
-            response = self.session.get(url, stream=True)
-            response.raise_for_status()
-            total_length = int(response.headers.get("content-length", 0))
-            chunk_size = 4096
+            with self.client.stream("GET", url) as response:
+                total_length = int(response.headers["Content-Length"])
+                chunk_size = 4096
 
-            with open(filename, "wb") as f:
-                for data in response.iter_content(chunk_size=chunk_size):
-                    f.write(data)
-                    progress.update(task, advance=len(data) / total_length * 100)
+                with open(filename, "wb") as f:
+                    for data in response.iter_bytes(chunk_size=chunk_size):
+                        f.write(data)
+                        progress.update(task, advance=len(data) / total_length * 100)
         rprint(f"[green]Download completed: {filename.name}")
 
 

@@ -1,6 +1,6 @@
 import sys
 
-import requests
+import httpx
 
 import typing
 from typing import Any, List, Dict, Optional
@@ -22,7 +22,7 @@ class ContrastUIAuthManager:
         self.sso_enabled = False
         self.license_active = False
         self.two_step_verification_enabled = False
-        self.session = requests.Session()
+        self.client = httpx.Client()
 
     def login(self, profile: str) -> None:
         """
@@ -32,10 +32,10 @@ class ContrastUIAuthManager:
         self.ui_credentials.get_username_from_user_input()
         self.check_sso(self.ui_credentials.username)
         if self.sso_enabled:
-            SystemExit("SSO is enabled. Exiting.")
+            sys.exit("SSO is enabled. Exiting.")
         self.check_if_license_is_active()
         if not self.license_active:
-            SystemExit("TeamServer license is not active. Exiting.")
+            sys.exit("TeamServer license is not active. Exiting.")
         self.ui_credentials.get_password_from_user_input()
         self.authenticate(self.ui_credentials.username, self.ui_credentials.password)
         self.set_xsrf_token_header()
@@ -76,18 +76,18 @@ class ContrastUIAuthManager:
     def get_session_cookie(self) -> None:
         """
         This is a hack to get the SESSION cookie set. It isn't
-        completely clear why this is neccessary. The cookie is set by the
+        completely clear why this is necessary. The cookie is set by the
         server in the response to the request. allow_redirects is set to
         False to prevent receiving the forwarded request. If this is not
-        done, a 401 error is recieved and the SESSION cookie is not set.
+        done, a 401 error is received and the SESSION cookie is not set.
         """
         try:
             url = f"{self.base_url}/api/ng/agent/feature"
-            response = self.session.get(url, allow_redirects=False)
+            response = self.client.get(url, follow_redirects=False)
             if response.status_code != 302:
                 # If the response is not a 302, the SESSION cookie is not set.
                 response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
+        except httpx.HTTPStatusError as e:
             print(e)
             sys.exit(1)
 
@@ -97,7 +97,7 @@ class ContrastUIAuthManager:
         """
         try:
             url = f"{self.base_url}/api/public/ng/information"
-            response = self.session.get(url)
+            response = self.client.get(url)
             if response.status_code == 200:
                 data = response.json()
                 if data.get("success"):
@@ -107,7 +107,7 @@ class ContrastUIAuthManager:
                     sys.exit(1)
             else:
                 response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
+        except httpx.HTTPStatusError as e:
             print(e)
             sys.exit(1)
 
@@ -120,17 +120,17 @@ class ContrastUIAuthManager:
         """
         try:
             url = f"{self.base_url}/api/public/ng/saml/email/{email}"
-            response = self.session.get(url)
-            if response.status_code == 200:
+            response = self.client.get(url)
+            if response.status_code == httpx.codes.OK:
                 self.sso_enabled = True
-            elif response.status_code == 404:
-                self.sso_enabled = True
+            elif response.status_code == httpx.codes.NOT_FOUND:
+                self.sso_enabled = False
                 data = response.json()
                 if data.get("success"):
                     print(data.get("messages")[0])
             else:
                 response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
+        except httpx.HTTPStatusError as e:
             print(e)
             sys.exit(1)
         return False
@@ -143,12 +143,12 @@ class ContrastUIAuthManager:
         """
         try:
             url = f"{self.base_url}/api/ng/contrast/license/active"
-            response = self.session.head(url)
+            response = self.client.head(url)
             if response.status_code == 200:
                 self.license_active = True
             else:
                 response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
+        except httpx.HTTPStatusError as e:
             print(e)
             sys.exit(1)
 
@@ -161,7 +161,7 @@ class ContrastUIAuthManager:
                 "password": password,
                 "sso": False,
             }
-            response = self.session.post(url, data=data)
+            response = self.client.post(url, data=data)
             if response.status_code == 200:
                 data = response.json()
                 messages: List[str] = []
@@ -180,7 +180,7 @@ class ContrastUIAuthManager:
                     sys.exit(1)
             else:
                 response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
+        except httpx.HTTPStatusError as e:
             print(e)
             sys.exit(1)
 
@@ -188,9 +188,9 @@ class ContrastUIAuthManager:
         """
         This sets the X-XSRF-TOKEN header to the value of the XSRF-TOKEN cookie.
         """
-        for cookie in self.session.cookies:
+        for cookie in self.client.cookies.jar:
             if cookie.name == "XSRF-TOKEN" and cookie.value:
-                self.session.headers.update(
+                self.client.headers.update(
                     {
                         "X-XSRF-TOKEN": cookie.value,
                     }
@@ -205,7 +205,7 @@ class ContrastUIAuthManager:
             data = {
                 "code": code,
             }
-            response = self.session.post(url, json=data)
+            response = self.client.post(url, json=data)
             if response.status_code == 200:
                 data = response.json()
                 if data.get("success"):
@@ -213,7 +213,7 @@ class ContrastUIAuthManager:
                     print(messages)
             else:
                 response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
+        except httpx.HTTPStatusError as e:
             print(e)
             sys.exit(1)
 
@@ -223,7 +223,7 @@ class ContrastUIAuthManager:
         """
         try:
             url = f"{self.base_url}/api/ng/profile/roles"
-            response = self.session.get(url)
+            response = self.client.get(url)
             if response.status_code == 200:
                 data = response.json()
                 if data.get("success"):
@@ -237,7 +237,7 @@ class ContrastUIAuthManager:
                     sys.exit(1)
             else:
                 response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
+        except httpx.HTTPStatusError as e:
             print(e)
             sys.exit(1)
 
@@ -247,14 +247,14 @@ class ContrastUIAuthManager:
         """
         try:
             url = f"{self.base_url}/api/ng/{organization_id}/users/keys/apikey"
-            response = self.session.get(url)
+            response = self.client.get(url)
             if response.status_code == 200:
                 data = response.json()
                 return typing.cast(str, data.get("api_key"))
             else:
                 response.raise_for_status()
             return ""
-        except requests.exceptions.HTTPError as e:
+        except httpx.HTTPStatusError as e:
             print(e)
             sys.exit(1)
 
@@ -264,14 +264,14 @@ class ContrastUIAuthManager:
         """
         try:
             url = f"{self.base_url}/api/ng/profile/servicekey"
-            response = self.session.get(url)
+            response = self.client.get(url)
             if response.status_code == 200:
                 data = response.json()
                 return typing.cast(str, data.get("service_key"))
             else:
                 response.raise_for_status()
             return ""
-        except requests.exceptions.HTTPError as e:
+        except httpx.HTTPStatusError as e:
             print(e)
             sys.exit(1)
 
@@ -282,7 +282,7 @@ class ContrastUIAuthManager:
         url = f"{self.base_url}/api/ng/profile/organizations"
 
         try:
-            response = self.session.get(url)
+            response = self.client.get(url)
             if response.status_code == 200:
                 data = response.json()
                 if data.get("count") > 0:
@@ -293,7 +293,7 @@ class ContrastUIAuthManager:
             else:
                 response.raise_for_status()
             return [""]
-        except requests.exceptions.HTTPError as e:
+        except httpx.HTTPStatusError as e:
             print(e)
             sys.exit(1)
 
@@ -330,10 +330,10 @@ class ContrastUIAuthManager:
         """
         url = f"{self.base_url}/api/ng/profile/toggle"
         try:
-            response = self.session.get(url)
+            response = self.client.get(url)
             if response.status_code != 200:
                 response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
+        except httpx.HTTPStatusError as e:
             print(e)
             sys.exit(1)
 
@@ -345,7 +345,7 @@ class ContrastUIAuthManager:
         """
         url = f"{self.base_url}/api/ng/superadmin/users/roles"
         try:
-            response = self.session.get(url)
+            response = self.client.get(url)
             if response.status_code == 200:
                 data = response.json()
                 roles = data.get("roles")
@@ -354,7 +354,7 @@ class ContrastUIAuthManager:
             else:
                 response.raise_for_status()
             return [""]
-        except requests.exceptions.HTTPError as e:
+        except httpx.HTTPStatusError as e:
             print(e)
             sys.exit(1)
 
@@ -370,7 +370,7 @@ class ContrastUIAuthManager:
             "includeDefaultOrgs": True,
         }
         try:
-            response = self.session.get(url, params=params)
+            response = self.client.get(url, params=params)
             if response.status_code == 200:
                 data = response.json()
                 if data.get("success"):
@@ -387,7 +387,7 @@ class ContrastUIAuthManager:
             else:
                 response.raise_for_status()
             return ""
-        except requests.exceptions.HTTPError as e:
+        except httpx.HTTPStatusError as e:
             print(e)
             sys.exit(1)
 
@@ -400,7 +400,7 @@ class ContrastUIAuthManager:
             f"{self.organization_uuid}/keys/apikey"
         )
         try:
-            response = self.session.get(url)
+            response = self.client.get(url)
             if response.status_code == 200:
                 data = response.json()
                 api_key = typing.cast(str, data.get("api_key"))
@@ -408,6 +408,6 @@ class ContrastUIAuthManager:
             else:
                 response.raise_for_status()
             return ""
-        except requests.exceptions.HTTPError as e:
+        except httpx.HTTPStatusError as e:
             print(e)
             sys.exit(1)

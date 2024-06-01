@@ -1,16 +1,15 @@
 # Script to query Contrast TeamServer to populate the vulnerability references with Secure Code Warrior video links
 # Author(s): josh.anderson@contrastsecurity.com / david.archer@contrastsecurity.com / jonathan.harper@contrastsecurity.com
 
-from urllib.request import Request, urlopen
-from c6t.external.integrations.scw.contrast_api import contrast_instance_from_json
 import traceback
-import json
 import urllib.parse
-import urllib.error
 
 import typing
 from typing import List, Dict, Any
 
+import httpx
+
+from c6t.external.integrations.scw.contrast_api import contrast_instance_from_json
 from c6t.configure.credentials import ContrastAPICredentials
 
 
@@ -23,14 +22,11 @@ def get_scw_base_url(cwe: str) -> str:
 
 def get_scw_data(url: str) -> Dict[str, Any]:
     try:
-        req = Request(url)
-
-        res = urlopen(req).read()
-        if res is None:
-            raise Exception("No data received from Secure Code Warrior")
-        data = typing.cast(Dict[str, Any], json.loads(res.decode("utf-8")))
+        response = httpx.get(url)
+        response.raise_for_status()
+        data = typing.cast(Dict[str, Any], response.json())
         return data
-    except urllib.error.HTTPError as err:
+    except httpx.HTTPStatusError as err:
         print(err)
         print(traceback.format_exc())
         raise Exception("No data received from Secure Code Warrior")
@@ -182,7 +178,7 @@ def scw_create(profile: str) -> None:
             try:
                 contrast.send_usage_event(org_id, False, org_key)
 
-            except urllib.error.HTTPError as err:
+            except httpx.HTTPStatusError as err:
                 if enable_verbose_error_logging:
                     print(err)
                     print(traceback.format_exc())
@@ -214,8 +210,7 @@ def scw_delete(profile: str) -> None:
     if allow_product_usage_analytics:
         try:
             contrast.send_usage_event(org_id, True, org_key)
-
-        except urllib.error.HTTPError as err:
+        except httpx.HTTPStatusError as err:
             if enable_verbose_error_logging:
                 print(err)
                 print(traceback.format_exc())
