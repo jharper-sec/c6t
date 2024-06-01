@@ -1,13 +1,11 @@
-# Class for interacting with the Contrast TeamServer REST APIs
-# Author: josh.anderson@contrastsecurity.com / jonathan.harper@contrastsecurity.com
-
 import json
 import re
 import base64
-from urllib.request import Request, urlopen
 
 import typing
 from typing import Any, Dict, List
+
+import httpx
 
 from c6t.configure.credentials import ContrastAPICredentials
 
@@ -92,31 +90,43 @@ class ContrastTeamServer:
         if not api_key:
             api_key = self._api_key
 
-        req = Request(self._teamserver_url + path)
-        req.add_header("Accept", "application/json")
-        req.add_header("Api-Key", api_key)
-        req.add_header("Authorization", self._authorization_header)
+        url = self._teamserver_url + path
+        headers = {
+            "Accept": "application/json",
+            "Api-Key": api_key,
+            "Authorization": self._authorization_header,
+        }
 
-        res = urlopen(req).read()
-        data = typing.cast(Dict[str, Any], json.loads(res.decode("utf-8")))
-
-        return data
+        try:
+            response = httpx.get(url, headers=headers)
+            response.raise_for_status()
+            data = typing.cast(Dict[str, Any], response.json())
+            return data
+        except httpx.HTTPStatusError as e:
+            print(e)
+            raise
 
     # Function to POST data to the Contrast TeamServer REST API and retrieve results as JSON
     def post_api_request(self, path: str, data: bytes, api_key: str = "") -> bytes:
         if not api_key:
             api_key = self._api_key
 
-        req = Request(self._teamserver_url + path, data)
-        req.add_header("Content-Type", "application/json")
-        req.add_header("Accept", "application/json")
-        req.add_header("Api-Key", api_key)
-        req.add_header("Authorization", self._authorization_header)
+        url = self._teamserver_url + path
+        headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Api-Key": api_key,
+            "Authorization": self._authorization_header,
+        }
 
-        res = urlopen(req).read()
-        data = json.loads(res.decode("utf-8"))
-
-        return data
+        try:
+            response = httpx.post(url, headers=headers, content=data)
+            response.raise_for_status()
+            data = response.json()
+            return data
+        except httpx.HTTPStatusError as e:
+            print(e)
+            raise
 
     # Superadmin API call to retrieve the API key for a specific organization
     def org_api_key(self, org_id: str) -> Dict[str, str]:

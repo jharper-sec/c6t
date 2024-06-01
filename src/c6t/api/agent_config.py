@@ -1,4 +1,4 @@
-import requests
+import httpx
 import base64
 from pathlib import Path
 
@@ -7,11 +7,11 @@ from c6t.configure.credentials import ContrastAPICredentials
 
 class AgentConfig:
     def __init__(self, profile: str):
-        self.session = requests.Session()
+        self.client = httpx.Client()
         self.credentials = ContrastAPICredentials()
         self.credentials.get_credentials_from_file(profile=profile)
 
-        self.session.headers.update(
+        self.client.headers.update(
             {
                 "API-Key": self.credentials.api_key,
                 "Authorization": self._create_authorization_header(),
@@ -39,7 +39,7 @@ class AgentConfig:
             f"{self.credentials.organization_uuid}/agents/external/default/"
             f"{language}"
         )
-        response = self.session.post(url)
+        response = self.client.post(url)
         if response.status_code == 200:
             return response.text
         else:

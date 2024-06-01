@@ -10,18 +10,28 @@
 -e file:.
 annotated-types==0.6.0
     # via c6t
+anyio==4.4.0
+    # via httpx
 certifi==2024.2.2
-    # via requests
-charset-normalizer==3.3.2
-    # via requests
+    # via httpcore
+    # via httpx
 click==8.1.7
     # via typer
+exceptiongroup==1.2.1
+    # via anyio
 gitdb==4.0.11
     # via gitpython
 gitpython==3.1.43
     # via c6t
+h11==0.14.0
+    # via httpcore
+httpcore==1.0.5
+    # via httpx
+httpx==0.27.0
+    # via c6t
 idna==3.7
-    # via requests
+    # via anyio
+    # via httpx
 jinja2==3.1.4
     # via c6t
 lxml==5.2.2
@@ -40,8 +50,6 @@ pyyaml==6.0.1
     # via c6t
 questionary==2.0.1
     # via c6t
-requests==2.32.0
-    # via c6t
 rich==13.7.1
     # via c6t
     # via typer
@@ -50,15 +58,17 @@ shellingham==1.5.4
     # via typer
 smmap==5.0.1
     # via gitdb
+sniffio==1.3.1
+    # via anyio
+    # via httpx
 typer==0.12.3
     # via c6t
 types-pyyaml==6.0.12.20240311
     # via c6t
 typing-extensions==4.11.0
     # via annotated-types
+    # via anyio
     # via rich
     # via typer
-urllib3==2.2.1
-    # via requests
 wcwidth==0.2.13
     # via prompt-toolkit
