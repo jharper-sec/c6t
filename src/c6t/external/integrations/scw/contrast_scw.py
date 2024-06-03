@@ -161,7 +161,7 @@ def scw_create(profile: str) -> None:
         if len(refs) > 0:
             res = contrast.update_rule_references(org_id, rule["name"], refs, org_key)
 
-            if res["success"] == True:  # type: ignore
+            if res["success"]:  # type: ignore
                 print(rule["name"] + "/" + rule["title"] + " updated successfully")
         else:
             print(
@@ -204,7 +204,7 @@ def scw_delete(profile: str) -> None:
         # The reset argument has been passed, erase all rule references.
         res = contrast.update_rule_references(org_id, rule["name"], [], org_key)
 
-        if res["success"] == True:  # type: ignore
+        if res["success"]:  # type: ignore
             print(rule["title"] + " reset successfully")
 
     if allow_product_usage_analytics:

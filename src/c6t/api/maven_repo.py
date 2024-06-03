@@ -39,7 +39,7 @@ class FileDownloader:
     def download_file(self, url: str, filename: Path) -> None:
         rprint(f"[cyan]Starting download from: {url}")
         with Progress() as progress:
-            task = progress.add_task(f"[cyan]Downloading...", total=100)
+            task = progress.add_task("[cyan]Downloading...", total=100)
             with self.client.stream("GET", url) as response:
                 total_length = int(response.headers["Content-Length"])
                 chunk_size = 4096

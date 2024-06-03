@@ -68,7 +68,7 @@ class ContrastTeamServer:
                 teamserver_url = teamserver_url + "/"
             elif (
                 re.match(regexBaseUrl + "\\/Contrast\\/api\\/ng\\/$", teamserver_url)
-                == None
+                is None
             ):
                 raise ValueError("Unrecognised TeamServer URL")
 

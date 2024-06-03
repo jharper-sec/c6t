@@ -8,8 +8,6 @@
 #   with-sources: false
 
 -e file:.
-annotated-types==0.6.0
-    # via c6t
 anyio==4.4.0
     # via httpx
 certifi==2024.2.2
@@ -54,7 +52,6 @@ rich==13.7.1
     # via c6t
     # via typer
 shellingham==1.5.4
-    # via c6t
     # via typer
 smmap==5.0.1
     # via gitdb
@@ -66,7 +63,6 @@ typer==0.12.3
 types-pyyaml==6.0.12.20240311
     # via c6t
 typing-extensions==4.11.0
-    # via annotated-types
     # via anyio
     # via rich
     # via typer
