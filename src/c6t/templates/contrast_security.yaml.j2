@@ -9,12 +9,14 @@ application:
   {% if application_name -%}
   name: {{ application_name }}
   {% endif -%}
-  session_metadata: 
-  {%- if branch_name %} branchName={{ branch_name }},{% endif -%}
+  {%- if branch_name or commit_hash or committer or repository or environment -%}
+  session_metadata: "
+  {%- if branch_name %}branchName={{ branch_name }},{% endif -%}
   {%- if commit_hash %}commitHash={{ commit_hash }},{% endif -%}
   {%- if committer %}committer={{ committer }},{% endif -%}
   {%- if repository %}repository={{ repository }},{% endif -%}
-  {%- if environment %}environment={{ environment }}{% endif %}
+  {%- if environment %}environment={{ environment }}{% endif -%}
+  "{%- endif %}
 server:
   {% if application_name -%}
   name: {{ application_name }}-{{ environment }}

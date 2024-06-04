@@ -1,6 +1,7 @@
 import httpx
 import base64
 from pathlib import Path
+import yaml
 
 from c6t.configure.credentials import ContrastAPICredentials
 
@@ -53,3 +54,15 @@ class AgentConfig:
         config_path = Path(path)
         with open(config_path, "w") as f:
             f.write(text)
+
+    def validate_agent_config_file_is_valid_yaml(self, path: str) -> bool:
+        """
+        Validate the Agent Config file is valid YAML
+        """
+        config_path = Path(path)
+        with open(config_path, "r") as f:
+            try:
+                yaml.safe_load(f)
+            except yaml.YAMLError:
+                return False
+        return True

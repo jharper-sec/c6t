@@ -1,5 +1,6 @@
 from typing import Optional
 from pathlib import Path
+import sys
 
 import typer
 import yaml
@@ -158,6 +159,14 @@ def agent_config(
         if path is None:
             path = "contrast_security.yaml"
         agent_config.write_agent_config_to_file(path=path, text=rendered_yaml_text)
+        rprint(f"Validating agent config file at {path}...")
+        valid = agent_config.validate_agent_config_file_is_valid_yaml(path=path)
+        if valid:
+            rprint(f"[green]Agent config file at {path} is valid")
+        else:
+            rprint(f"[red]Agent config file at {path} is invalid")
+            sys.exit(1)
+
     elif type == "env":
         if path is None:
             path = "contrast.env"
