@@ -167,7 +167,7 @@ class ContrastUIAuthManager:
                 messages: List[str] = []
                 if data.get("success"):
                     messages = typing.cast(List[str], data.get("messages"))
-                    print(messages)
+                    print(messages[0])
                     if data.get("toggle_enabled"):
                         # Two-Step Verification (TSV) is enabled
                         self.two_step_verification_enabled = True
@@ -176,7 +176,7 @@ class ContrastUIAuthManager:
                         self.two_step_verification_enabled = False
                 else:
                     messages = typing.cast(List[str], data.get("messages"))
-                    print(messages)
+                    print(messages[0])
                     sys.exit(1)
             else:
                 response.raise_for_status()
@@ -210,7 +210,7 @@ class ContrastUIAuthManager:
                 data = response.json()
                 if data.get("success"):
                     messages: List[str] = typing.cast(List[str], data.get("messages"))
-                    print(messages)
+                    print(messages[0])
             else:
                 response.raise_for_status()
         except httpx.HTTPStatusError as e:
