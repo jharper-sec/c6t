@@ -21,10 +21,12 @@ from c6t.external.integrations.scw.contrast_scw import scw_create, scw_delete
 app = typer.Typer()
 integrations_app = typer.Typer()
 scw_integration_app = typer.Typer()
+tools = typer.Typer()
 app.add_typer(
     integrations_app, name="integrations", help="Integrations with other tools"
 )
 integrations_app.add_typer(scw_integration_app, name="scw", help="Secure Code Warrior")
+app.add_typer(tools, name="tools", help="Additional tools")
 
 
 @app.command("login")
@@ -219,6 +221,21 @@ def scw_reset(profile: str = "default") -> None:
     """
     rprint("Deleting SCW links...")
     scw_delete(profile=profile)
+
+
+@tools.command("udp-server")
+def udp_server(
+    udp_ip: str = "0.0.0.0",
+    udp_port: int = 514,
+    forward_ip: Optional[str] = None,
+    forward_port: Optional[int] = None,
+) -> None:
+    """
+    Start a UDP server to receive Contrast agent syslog messages.
+    """
+    from c6t.tools.udp_server import start_udp_server
+
+    start_udp_server(udp_ip, udp_port, forward_ip, forward_port)
 
 
 if __name__ == "__main__":
