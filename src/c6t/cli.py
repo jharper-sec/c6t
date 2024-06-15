@@ -17,6 +17,12 @@ from c6t.ui.auth import ContrastUIAuthManager
 from c6t.api.agent_config import AgentConfig
 from c6t.api import maven_repo
 from c6t.external.integrations.scw.contrast_scw import scw_create, scw_delete
+from c6t.tools.udp_server import start_udp_server
+from c6t.tools.send_udp_test_message import (
+    SyslogFacility,
+    SyslogSeverity,
+    send_udp_test_message,
+)
 
 app = typer.Typer()
 integrations_app = typer.Typer()
@@ -233,9 +239,28 @@ def udp_server(
     """
     Start a UDP server to receive Contrast agent syslog messages.
     """
-    from c6t.tools.udp_server import start_udp_server
 
     start_udp_server(udp_ip, udp_port, forward_ip, forward_port)
+
+
+@tools.command("send-udp-message")
+def send_udp_message(
+    udp_ip: str = "127.0.0.1",
+    udp_port: int = 514,
+    syslog_facility: int = SyslogFacility.LOCAL3.value,
+    syslog_severity: int = SyslogSeverity.INFO.value,
+    message: str = "Test message from c6t.",
+):
+    """
+    Send a UDP message to the specified IP and port.
+    """
+    send_udp_test_message(
+        udp_ip=udp_ip,
+        udp_port=udp_port,
+        syslog_facility=syslog_facility,
+        syslog_severity=syslog_severity,
+        message=message,
+    )
 
 
 if __name__ == "__main__":
