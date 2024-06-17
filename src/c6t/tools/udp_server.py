@@ -25,8 +25,6 @@ def start_udp_server(
     while not stop_event or not stop_event.is_set():
         data, addr = sock.recvfrom(1024)
         rprint(f"Received message from {addr}: {data.decode()}")
-        sys.stdout.write(data.decode("utf-8"))
-        sys.stdout.flush()
         if forward_ip and forward_port:
             sock_forward.sendto(data, forward_address)
             rprint(f"Forwarded message to {forward_address}")
