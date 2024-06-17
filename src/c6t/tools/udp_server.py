@@ -1,4 +1,3 @@
-import sys
 import socket
 import threading
 from typing import Optional
