@@ -231,8 +231,8 @@ def scw_reset(profile: str = "default") -> None:
 
 @tools.command("udp-server")
 def udp_server(
-    udp_ip: str = "0.0.0.0",
-    udp_port: int = 514,
+    udp_ip: str = "127.0.0.1",
+    udp_port: int = 10514,
     forward_ip: Optional[str] = None,
     forward_port: Optional[int] = None,
 ) -> None:
@@ -246,7 +246,7 @@ def udp_server(
 @tools.command("send-udp-message")
 def send_udp_message(
     udp_ip: str = "127.0.0.1",
-    udp_port: int = 514,
+    udp_port: int = 10514,
     syslog_facility: int = SyslogFacility.LOCAL3.value,
     syslog_severity: int = SyslogSeverity.INFO.value,
     message: str = "Test message from c6t.",

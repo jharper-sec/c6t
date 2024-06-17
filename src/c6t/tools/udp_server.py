@@ -1,9 +1,17 @@
+import sys
 import socket
+import threading
 from typing import Optional
+
+from rich import print as rprint
 
 
 def start_udp_server(
-    udp_ip: str, udp_port: int, forward_ip: Optional[str], forward_port: Optional[int]
+    udp_ip: str,
+    udp_port: int,
+    forward_ip: Optional[str],
+    forward_port: Optional[int],
+    stop_event: Optional[threading.Event] = None,
 ) -> None:
     address = (udp_ip, udp_port)
     forward_address = (forward_ip, forward_port)
@@ -11,12 +19,18 @@ def start_udp_server(
     sock_forward = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind(address)
 
-    print(f"UDP server started on {address}")
+    rprint(f"UDP server started on {address}")
     if forward_ip and forward_port:
-        print(f"Forwarding to {forward_address}")
-    while True:
+        rprint(f"Forwarding to {forward_address}")
+    while not stop_event or not stop_event.is_set():
         data, addr = sock.recvfrom(1024)
-        print(f"Received message from {addr}: {data.decode()}")
+        rprint(f"Received message from {addr}: {data.decode()}")
+        sys.stdout.write(data.decode("utf-8"))
+        sys.stdout.flush()
         if forward_ip and forward_port:
             sock_forward.sendto(data, forward_address)
-            print(f"Forwarded message to {forward_address}")
+            rprint(f"Forwarded message to {forward_address}")
+
+    sock.close()
+    if forward_ip and forward_port:
+        sock_forward.close()
