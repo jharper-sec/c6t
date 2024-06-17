@@ -128,7 +128,8 @@ def agent_config(
     # Load Jinga2 template and render using YAML text
     rprint("Rendering agent config...")
     template_env = Environment(
-        loader=PackageLoader("c6t", "templates"), autoescape=True,
+        loader=PackageLoader("c6t", "templates"),
+        autoescape=True,
     )
 
     yaml_template = template_env.get_template("contrast_security.yaml.j2")
@@ -250,7 +251,7 @@ def send_udp_message(
     syslog_facility: int = SyslogFacility.LOCAL3.value,
     syslog_severity: int = SyslogSeverity.INFO.value,
     message: str = "Test message from c6t.",
-):
+) -> None:
     """
     Send a UDP message to the specified IP and port.
     """

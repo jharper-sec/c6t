@@ -1,4 +1,5 @@
 import socket
+import typing
 from datetime import datetime, timezone
 from enum import Enum
 
@@ -50,10 +51,10 @@ def get_local_ip_address() -> str:
     s.connect(("8.8.8.8", 80))
     ip_address = s.getsockname()[0]
     s.close()
-    return ip_address
+    return typing.cast(str, ip_address)
 
 
-def get_current_time():
+def get_current_time() -> str:
     now = datetime.now(timezone.utc).astimezone()
     formatted_time = now.strftime("%b %d %Y %H:%M:%S.%f")[:-3] + now.strftime("%z")
     return formatted_time
@@ -63,7 +64,7 @@ def get_syslog_priority(syslog_facility: int, syslog_severity: int) -> int:
     return syslog_facility * 8 + syslog_severity
 
 
-def create_cef_message(syslog_facility: int, syslog_severity: int, message: str):
+def create_cef_message(syslog_facility: int, syslog_severity: int, message: str) -> str:
     current_time = get_current_time()
     ip_address = get_local_ip_address()
     syslog_priority = get_syslog_priority(
