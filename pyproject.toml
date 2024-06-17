@@ -1,6 +1,6 @@
 [project]
 name = "c6t"
-version = "0.0.12"
+version = "0.0.13"
 description = "Unofficial Administrative Command Line Interface for Contrast Security"
 authors = [
     { name = "Jonathan Harper", email = "39912347+jharper-sec@users.noreply.github.com" },
