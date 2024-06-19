@@ -40,7 +40,7 @@ jobs:
         npm install --location=global @contrast/contrast@2.0.0
     - name: Scan file
       run: |
-        contrast-cli --scan ./ \
+        contrast --scan ./ \
           --api_key ${{ secrets.CONTRAST__API__API_KEY }} \
           --authorization ${{ secrets.CONTRAST__API__AUTH_TOKEN }} \
           --organization_id ${{ secrets.CONTRAST__API__ORGANIZATION_ID }} \
