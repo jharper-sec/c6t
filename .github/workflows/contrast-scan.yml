@@ -35,19 +35,15 @@ jobs:
     # check out project
     steps:
     - uses: actions/checkout@v4
-    # Since Contrast Scan is designed to run against your deployable artifact, the steps to build your artifact should go here.
-    # -name: Build Project
-    # ...
-    # Scan Artifact
-    - name: Contrast Scan Action
-      uses: Contrast-Security-OSS/contrastscan-action@7352a45d9678ec8a434cf061b07ffb51c1e351a1
-      with:
-        artifact: mypath/target/myartifact.jar # replace this path with the path to your built artifact
-        apiKey: ${{ secrets.CONTRAST_API_KEY }}
-        orgId: ${{ secrets.CONTRAST_ORGANIZATION_ID }}
-        authHeader: ${{ secrets.CONTRAST_AUTH_HEADER }}
-    #Upload the results to GitHub
-    - name: Upload SARIF file
-      uses: github/codeql-action/upload-sarif@v2
-      with:
-        sarif_file: results.sarif # The file name must be 'results.sarif', as this is what the Github Action will output
+    - name: Set up contrast-cli
+      run: |
+        npm install --location=global @contrast/contrast@2.0.0
+    - name: Scan file
+      run: |
+        contrast-cli --scan ./ \
+          --api_key ${{ secrets.CONTRAST__API__API_KEY }} \
+          --authorization ${{ secrets.CONTRAST__API__AUTH_TOKEN }} \
+          --organization_id ${{ secrets.CONTRAST__API__ORGANIZATION_ID }} \
+          --host ${{ secrets.CONTRAST__API__URL }} \
+          --project_name c6t-cli \
+          --language Python --wait_for_scan
