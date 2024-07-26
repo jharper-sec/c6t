@@ -22,6 +22,7 @@ from c6t.tools.send_udp_test_message import (
     SyslogFacility,
     SyslogSeverity,
     send_udp_test_message,
+    send_syslog_test_message
 )
 
 app = typer.Typer()
@@ -263,6 +264,24 @@ def send_udp_message(
         message=message,
     )
 
+@tools.command("send-syslog-message")
+def send_syslog_message(
+    udp_ip: str = "127.0.0.1",
+    udp_port: int = 10514,
+    syslog_facility: int = SyslogFacility.LOCAL3.value,
+    syslog_severity: int = SyslogSeverity.INFO.value,
+    message: str = "Test message from c6t.",
+) -> None:
+    """
+    Send a UDP message to the specified IP and port.
+    """
+    send_syslog_test_message(
+        udp_ip=udp_ip,
+        udp_port=udp_port,
+        syslog_facility=syslog_facility,
+        syslog_severity=syslog_severity,
+        message=message,
+    )
 
 if __name__ == "__main__":
     app()

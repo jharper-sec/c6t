@@ -60,6 +60,12 @@ def get_current_time() -> str:
     return formatted_time
 
 
+def get_current_syslog_time() -> str:
+    now = datetime.now(timezone.utc).astimezone()
+    formatted_time = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + now.strftime("%z")
+    return formatted_time
+
+
 def get_syslog_priority(syslog_facility: int, syslog_severity: int) -> int:
     return syslog_facility * 8 + syslog_severity
 
@@ -73,6 +79,14 @@ def create_cef_message(syslog_facility: int, syslog_severity: int, message: str)
     c6t_version = get_c6t_version()
     return f"<{syslog_priority}>{current_time} {ip_address} CEF:0|Contrast Security|Contrast - c6t|{c6t_version}|TEST|{message}"
 
+def create_syslog_message(syslog_facility: int, syslog_severity: int, message: str) -> str:
+    current_time = get_current_syslog_time()
+    ip_address = get_local_ip_address()
+    syslog_priority = get_syslog_priority(
+        syslog_facility=syslog_facility, syslog_severity=syslog_severity
+    )
+    c6t_version = get_c6t_version()
+    return f"<{syslog_priority}>{current_time} {ip_address} CEF:0|Contrast Security|Contrast - c6t|{c6t_version}|TEST|{message}"
 
 def send_udp_test_message(
     udp_ip: str, udp_port: int, syslog_facility: int, syslog_severity: int, message: str
@@ -89,3 +103,19 @@ def send_udp_test_message(
     )
     sock.sendto(cef_message.encode(), address)
     print(f"Sent message to {address}: {cef_message}")
+
+def send_syslog_test_message(
+    udp_ip: str, udp_port: int, syslog_facility: int, syslog_severity: int, message: str
+) -> None:
+    """
+    Send a Syslog message to a specified IP and port.
+    """
+    address = (udp_ip, udp_port)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    syslog_message = create_syslog_message(
+        syslog_facility=syslog_facility,
+        syslog_severity=syslog_severity,
+        message=message,
+    )
+    sock.sendto(syslog_message.encode(), address)
+    print(f"Sent message to {address}: {syslog_message}")
