@@ -62,7 +62,7 @@ def get_current_time() -> str:
 
 def get_current_syslog_time() -> str:
     now = datetime.now(timezone.utc).astimezone()
-    formatted_time = now.strftime("%b %d %H:%M:%S")
+    formatted_time = now.strftime("%b %d %Y %H:%M:%S.%f")[:-3] + now.strftime(" %Z")
     return formatted_time
 
 
