@@ -36,41 +36,75 @@ app.add_typer(tools, name="tools", help="Additional tools")
 
 
 @app.command("login")
-def login(profile: str = "default") -> None:
+def login(
+    profile: str = "default",
+    username: Optional[str] = None,
+    password: Optional[str] = None,
+    environment: Optional[str] = None,
+    url: Optional[str] = None,
+    organization_uuid: Optional[str] = None,
+) -> None:
     """
     Login to the Contrast platform using your UI credentials (username/password).
     This will automatically configure your API credentials and save them to the
     credentials file.
-    """
 
-    contrast_environment = questionary.select(
-        "Select your Contrast TeamServer Environment:",
-        choices=[
-            {
+    Args:
+        profile: The credentials profile to use (default: "default")
+        username: Contrast username (optional)
+        password: Contrast password (optional)
+        environment: Contrast environment - "trial", "eval", or "enterprise" (optional)
+        url: Custom Contrast TeamServer URL for enterprise installations (optional)
+        organization_uuid: Specific organization UUID to use (optional)
+    """
+    contrast_environment = None
+    
+    if environment:
+        environment = environment.lower()
+        if environment == "trial":
+            contrast_environment = "https://cs004.contrastsecurity.com/Contrast"
+        elif environment == "eval":
+            contrast_environment = "https://eval.contrastsecurity.com/Contrast"
+        elif environment == "enterprise":
+            contrast_environment = url if url else questionary.text(
+                "Enter your Contrast TeamServer URL:"
+            ).ask()
+    
+    if not contrast_environment:
+        contrast_environment = questionary.select(
+            "Select your Contrast TeamServer Environment:",
+            choices=[
+                {
+                    "name": "Free Trial",
+                    "value": "https://cs004.contrastsecurity.com/Contrast",
+                },
+                {
+                    "name": "Evaluation",
+                    "value": "https://eval.contrastsecurity.com/Contrast",
+                },
+                {"name": "Enterprise", "value": "Enterprise"},
+            ],
+            default={
                 "name": "Free Trial",
                 "value": "https://cs004.contrastsecurity.com/Contrast",
             },
-            {
-                "name": "Evaluation",
-                "value": "https://eval.contrastsecurity.com/Contrast",
-            },
-            {"name": "Enterprise", "value": "Enterprise"},
-        ],
-        default={
-            "name": "Free Trial",
-            "value": "https://cs004.contrastsecurity.com/Contrast",
-        },
-    ).ask()
-
-    if contrast_environment == "Enterprise":
-        contrast_environment = questionary.text(
-            "Enter your Contrast TeamServer URL:"
         ).ask()
+
+        if contrast_environment == "Enterprise":
+            contrast_environment = questionary.text(
+                "Enter your Contrast TeamServer URL:"
+            ).ask()
 
     if contrast_environment:
         auth = ContrastUIAuthManager(base_url=contrast_environment)
+        # Pre-set the credentials if provided
+        if username:
+            auth.ui_credentials.username = username
+        if password:
+            auth.ui_credentials.password = password
+        if organization_uuid:
+            auth.organization_uuid = organization_uuid
         auth.login(profile=profile)
-
 
 @app.command("configure")
 def configure(profile: str = "default") -> None:

@@ -4,21 +4,26 @@ import typer
 
 
 class ContrastUICredentials:
-    base_url: str
-    username: str
-    superadmin: bool
-    password: str
-    code: str
+    def __init__(self):
+        self.base_url: str = ""
+        self.username: str = ""
+        self.superadmin: bool = False
+        self.password: str = ""
+        self.code: str = ""
 
     def get_username_from_user_input(self) -> None:
-        username = typer.prompt("Email")
-        # TODO: Validate username/email
-        self.username = username
+        # Only prompt if username is not already set
+        if not self.username:
+            username = typer.prompt("Email")
+            # TODO: Validate username/email
+            self.username = username
 
     def get_password_from_user_input(self) -> None:
-        password = typer.prompt("Password", hide_input=True)
-        # TODO: Validate password
-        self.password = password
+        # Only prompt if password is not already set
+        if not self.password:
+            password = typer.prompt("Password", hide_input=True)
+            # TODO: Validate password
+            self.password = password
 
     def get_code_from_user_input(self) -> None:
         code = typer.prompt("Code")
