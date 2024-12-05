@@ -1,2 +1,2 @@
 __app_name__ = "c6t"
-__version__ = "0.0.13"
+__version__ = "0.1.0"
