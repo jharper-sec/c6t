@@ -3,7 +3,7 @@ import sys
 import httpx
 
 import typing
-from typing import Any, List, Dict, Optional
+from typing import TypedDict, Any, List, Dict, Optional, cast
 
 import typer
 
@@ -11,6 +11,17 @@ import questionary
 
 from c6t.configure.credentials import ContrastAPICredentials, ContrastUICredentials
 
+class AuthenticationData(TypedDict):
+    ui: bool
+    username: str
+    password: str
+    sso: bool
+
+
+class AuthenticationResponse(TypedDict):
+    success: bool
+    messages: List[str]
+    toggle_enabled: Optional[bool]
 
 class ContrastUIAuthManager:
     def __init__(self, base_url: str):
@@ -23,6 +34,7 @@ class ContrastUIAuthManager:
         self.license_active = False
         self.two_step_verification_enabled = False
         self.client = httpx.Client()
+        self.organization_uuid: Optional[str] = None
 
     def login(self, profile: str) -> None:
         """
@@ -155,27 +167,22 @@ class ContrastUIAuthManager:
     def authenticate(self, username: str, password: str) -> None:
         try:
             url = f"{self.base_url}/authenticate.html"
-            data = {
+            auth_data: AuthenticationData = {
                 "ui": False,
                 "username": username,
                 "password": password,
                 "sso": False,
             }
-            response = self.client.post(url, data=data)
+            response = self.client.post(url, data=auth_data)
             if response.status_code == 200:
-                data = response.json()
+                data = cast(AuthenticationResponse, response.json())
                 messages: List[str] = []
                 if data.get("success"):
-                    messages = typing.cast(List[str], data.get("messages"))
+                    messages = data["messages"]
                     print(messages[0])
-                    if data.get("toggle_enabled"):
-                        # Two-Step Verification (TSV) is enabled
-                        self.two_step_verification_enabled = True
-                    else:
-                        # Two-Step Verification (TSV) is not enabled
-                        self.two_step_verification_enabled = False
+                    self.two_step_verification_enabled = bool(data.get("toggle_enabled", False))
                 else:
-                    messages = typing.cast(List[str], data.get("messages"))
+                    messages = data["messages"]
                     print(messages[0])
                     sys.exit(1)
             else:
@@ -297,10 +304,17 @@ class ContrastUIAuthManager:
             print(e)
             sys.exit(1)
 
-    def select_organization(self, organizations: Any) -> Any:
+    def select_organization(self, organizations: Any) -> str:
         """
-        Ask the user to select an organization by index number
+        Ask the user to select an organization by index number or use pre-set organization UUID
         """
+        # If organization_uuid is pre-set, validate it exists in the list
+        if self.organization_uuid:
+            for org in organizations:
+                if org.get("organization_uuid") == self.organization_uuid:
+                    return self.organization_uuid
+            # If pre-set UUID wasn't found, warn user and fall back to interactive selection
+            print(f"Warning: Organization UUID {self.organization_uuid} not found in available organizations")
 
         organization_choices: List[Dict[str, Optional[str]]] = []
 
@@ -313,14 +327,14 @@ class ContrastUIAuthManager:
             )
 
         if len(organization_choices) == 1:
-            return organization_choices[0].get("value")
+            return typing.cast(str, organization_choices[0].get("value"))
 
         organization_uuid = questionary.select(
             message="Select your organization:",
             choices=organization_choices,
         ).ask()
 
-        return organization_uuid
+        return typing.cast(str, organization_uuid)
 
     def toggle_superadmin(self) -> None:
         """
