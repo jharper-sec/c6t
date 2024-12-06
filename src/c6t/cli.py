@@ -15,6 +15,7 @@ import questionary
 from c6t.configure.credentials import ContrastAPICredentials
 from c6t.ui.auth import ContrastUIAuthManager
 from c6t.api.agent_config import AgentConfig
+from c6t.api.applications import Applications
 from c6t.api import maven_repo
 from c6t.external.integrations.scw.contrast_scw import scw_create, scw_delete
 from c6t.tools.udp_server import start_udp_server
@@ -129,6 +130,7 @@ def agent_config(
     type: str = "yaml",
     path: Optional[str] = None,
     application_name: Optional[str] = None,
+    application_group: Optional[str] = None,
     environment: str = "dev",
     language: str = "JAVA",
     include_credentials: bool = True,
@@ -175,6 +177,7 @@ def agent_config(
         service_key=credentials.get("service_key"),
         user_name=credentials.get("user_name"),
         application_name=application_name,
+        application_group=application_group,
         branch_name=branch_name,
         commit_hash=commit_hash,
         committer=committer,
@@ -189,6 +192,7 @@ def agent_config(
         service_key=credentials.get("service_key"),
         user_name=credentials.get("user_name"),
         application_name=application_name,
+        application_group=application_group,
         branch_name=branch_name,
         commit_hash=commit_hash,
         committer=committer,
@@ -214,6 +218,22 @@ def agent_config(
         if path is None:
             path = "contrast.env"
         agent_config.write_agent_config_to_file(path=path, text=rendered_env_text)
+
+
+@app.command("reset-application")
+def reset_application(
+    app_name: str,
+    profile: str = "default",
+) -> None:
+    """
+    Reset the application to its original state.
+    """
+    rprint("Resetting application...")
+
+    applications = Applications(profile=profile)
+    app_id = applications.get_app_id_from_name(app_name)
+    message = applications.reset_application(app_id)
+    rprint(message)
 
 
 @app.command("download-agent")
