@@ -9,6 +9,9 @@ application:
   {% if application_name -%}
   name: {{ application_name }}
   {% endif -%}
+  {% if application_group -%}
+  group: {{ application_group }}
+  {% endif -%}
   {%- if branch_name or commit_hash or committer or repository or environment -%}
   session_metadata: "
   {%- if branch_name %}branchName={{ branch_name }},{% endif -%}

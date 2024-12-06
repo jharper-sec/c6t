@@ -7,6 +7,9 @@ CONTRAST__API__USER_NAME={{ user_name}}
 {% if application_name -%}
 CONTRAST__APPLICATION__NAME={{ application_name }}
 {% endif -%}
+{% if application_group -%}
+CONTRAST__APPLICATION__GROUP={{ application_group }}
+{% endif -%}
 CONTRAST__APPLICATION__SESSION_METADATA=
   {%- if branch_name %}branchName={{ branch_name }},{% endif -%}
   {%- if commit_hash %}commitHash={{ commit_hash }},{% endif -%}
